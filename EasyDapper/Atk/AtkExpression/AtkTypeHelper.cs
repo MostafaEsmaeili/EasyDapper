@@ -11,13 +11,11 @@ namespace Atk.AtkExpression
   {
     public static string GetColumnAlias<TEntity>(string columnName)
     {
-      PropertyInfo element = typeof (TEntity).GetProperties().Where(p => p.Name == columnName).FirstOrDefault();
+      var element = typeof (TEntity).GetProperties().FirstOrDefault(p => p.Name == columnName);
       if (element == null)
         return columnName;
-      ColumnAttribute customAttribute = (ColumnAttribute) element.GetCustomAttribute(typeof (ColumnAttribute));
-      if (customAttribute != null)
-        return customAttribute.Name;
-      return columnName;
+      var customAttribute = (ColumnAttribute) element.GetCustomAttribute(typeof (ColumnAttribute));
+      return customAttribute != null ? customAttribute.Name : columnName;
     }
 
     public static Type FindIEnumerable(Type seqType)
@@ -28,21 +26,21 @@ namespace Atk.AtkExpression
         return typeof (IEnumerable<>).MakeGenericType(seqType.GetElementType());
       if (seqType.IsGenericType)
       {
-        foreach (Type genericArgument in seqType.GetGenericArguments())
+        foreach (var genericArgument in seqType.GetGenericArguments())
         {
-          Type type = typeof (IEnumerable<>).MakeGenericType(genericArgument);
+          var type = typeof (IEnumerable<>).MakeGenericType(genericArgument);
           if (type.IsAssignableFrom(seqType))
             return type;
         }
       }
-      Type[] interfaces = seqType.GetInterfaces();
-      if (interfaces != null && (uint) interfaces.Length > 0U)
+      var interfaces = seqType.GetInterfaces();
+      if ((uint) interfaces.Length > 0U)
       {
-        foreach (Type seqType1 in interfaces)
+        foreach (var seqType1 in interfaces)
         {
-          Type ienumerable = FindIEnumerable(seqType1);
-          if (ienumerable != null)
-            return ienumerable;
+          var iEnumerable = FindIEnumerable(seqType1);
+          if (iEnumerable != null)
+            return iEnumerable;
         }
       }
       if (seqType.BaseType != null && seqType.BaseType != typeof (object))

@@ -32,32 +32,30 @@ namespace EasyDapper.MsSqlServer
         throw new InvalidOperationException("For cannot be used ParamSet have been used, please create a new command.");
       if (entity == null && !setSelectors.Any())
         throw new InvalidOperationException("Build cannot be used on a statement that has not been initialised using Set or For.");
-      if (typeof (TEntity).GetProperties().Where(p =>
-      {
-          if (!p.IsKeyField())
-              return p.IsIdField();
-          return true;
-      }).Count() == 0)
+      if (!typeof (TEntity).GetProperties().Any(p => p.IsKeyField() || p.IsIdField()))
         throw new InvalidOperationException("以实例更新时，实例类必需至少有一个属性标记为[KeyFiled] 特性！");
-      return string.Format("UPDATE [{0}].[{1}]\nSET {2}{3};", (object) GetTableSchema(), (object) GetTableName(), (object) GetSetClause(""), (object) GetWhereClause(""));
+      return
+          $"UPDATE [{(object) GetTableSchema()}].[{(object) GetTableName()}]\nSET {(object) GetSetClause("")}{(object) GetWhereClause("")};";
     }
 
-    protected override string GetSetClauseFromEntity(string perParam)
-    {
-      return FormatColumnValuePairs(!string.IsNullOrWhiteSpace(perParam) ? typeof (TEntity).GetProperties().Where(p =>
+      protected override string GetSetClauseFromEntity(string perParam)
       {
-          if (!p.IsIdField() && p.CanWrite)
-              return writablePropertyMatcher.TestIsDbField(p);
-          return false;
-      }).Select(p => p.ColumnName() + "  = @" + p.Name) : typeof (TEntity).GetProperties().Where(p =>
-      {
-          if (!p.IsIdField() && p.CanWrite)
-              return writablePropertyMatcher.TestIsDbField(p);
-          return false;
-      }).Select(p => "[" + p.ColumnName() + "] = " + FormatValue(p.GetValue(entity))));
-    }
+          return FormatColumnValuePairs(!string.IsNullOrWhiteSpace(perParam)
+              ? typeof(TEntity).GetProperties().Where(p =>
+              {
+                  if (!p.IsIdField() && p.CanWrite)
+                      return writablePropertyMatcher.TestIsDbField(p);
+                  return false;
+              }).Select(p => p.ColumnName() + "  = @" + p.Name)
+              : typeof(TEntity).GetProperties().Where(p =>
+              {
+                  if (!p.IsIdField() && p.CanWrite)
+                      return writablePropertyMatcher.TestIsDbField(p);
+                  return false;
+              }).Select(p => "[" + p.ColumnName() + "] = " + FormatValue(p.GetValue(entity))));
+      }
 
-    protected override string GetSetClauseFromSelectors(string perParam)
+      protected override string GetSetClauseFromSelectors(string perParam)
     {
       return FormatColumnValuePairs(!string.IsNullOrWhiteSpace(perParam) ? setSelectors.Select((e, i) => GetMemberColumnName(e) + "  = @" + GetMemberName(e)) : setSelectors.Select((e, i) => "[" + GetMemberColumnName(e) + "] = " + FormatValue(setValues[i])));
     }
@@ -67,38 +65,28 @@ namespace EasyDapper.MsSqlServer
       return string.IsNullOrEmpty(TableSchema) ? "dbo" : TableSchema;
     }
 
-    protected override string GetWhereClause(string perParam = "")
-    {
-      if (entity != null)
+      protected override string GetWhereClause(string perParam = "")
       {
-        var columnValuePairs = !string.IsNullOrWhiteSpace(perParam) ? typeof (TEntity).GetProperties().Where(p =>
-        {
-            if (!p.IsKeyField())
-                return p.IsIdField();
-            return true;
-        }).Select(p => p.ColumnName() + "  = @" + p.Name) : typeof (TEntity).GetProperties().Where(p =>
-        {
-            if (!p.IsKeyField())
-                return p.IsIdField();
-            return true;
-        }).Select(p => " [" + p.ColumnName() + "] = " + FormatValue(p.GetValue(entity)));
-        if (columnValuePairs != null)
-          return "\nWHERE " + FormatColumnValuePairs(columnValuePairs);
-      }
-      var str = whereClauseBuilder.Sql();
-      return string.IsNullOrWhiteSpace(str) ? string.Empty : "\n" + str;
-    }
+          if (entity != null)
+          {
+              var columnValuePairs = !string.IsNullOrWhiteSpace(perParam)
+                  ? typeof(TEntity).GetProperties().Where(p => p.IsKeyField() || p.IsIdField())
+                      .Select(p => p.ColumnName() + "  = @" + p.Name)
+                  : typeof(TEntity).GetProperties().Where(p => p.IsKeyField() || p.IsIdField()).Select(p =>
+                      " [" + p.ColumnName() + "] = " + FormatValue(p.GetValue(entity)));
+              return "\nWHERE " + FormatColumnValuePairs(columnValuePairs);
+          }
 
-    public override string ParamSql()
+          var str = whereClauseBuilder.Sql();
+          return string.IsNullOrWhiteSpace(str) ? string.Empty : "\n" + str;
+      }
+
+      public override string ParamSql()
     {
-      if (entity != null && typeof (TEntity).GetProperties().Where(p =>
-      {
-          if (!p.IsKeyField())
-              return p.IsIdField();
-          return true;
-      }).Count() == 0)
+      if (entity != null && !typeof (TEntity).GetProperties().Any(p => p.IsKeyField() || p.IsIdField()))
         throw new InvalidOperationException("以实例更新时，实例类必需至少有一个属性标记为[KeyFiled] 特性！");
-      return string.Format("UPDATE [{0}].[{1}]\nSET {2}{3};", (object) GetTableSchema(), (object) GetTableName(), (object) GetSetClause("@"), (object) GetWhereClause("@"));
+      return
+          $"UPDATE [{(object) GetTableSchema()}].[{(object) GetTableName()}]\nSET {(object) GetSetClause("@")}{(object) GetWhereClause("@")};";
     }
   }
 }
