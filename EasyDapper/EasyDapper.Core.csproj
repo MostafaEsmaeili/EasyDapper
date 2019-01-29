@@ -11,16 +11,12 @@
     <PackageProjectUrl>https://github.com/AzThinker/SqlRepoEx</PackageProjectUrl>
     <PackageTags>
 sql, repository, builder</PackageTags>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <AssemblyName>EasyDapper.Core</AssemblyName>
     <RootNamespace></RootNamespace>
     <AssemblyVersion>1.1.0.0</AssemblyVersion>
     <FileVersion>1.1.0.0</FileVersion>
   </PropertyGroup>
-
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="del   /S /Q  &quot;$(ProjectDir)&quot;*.nupkg" />
-  </Target>
 
   <ItemGroup>
     <Reference Include="Microsoft.CSharp">
