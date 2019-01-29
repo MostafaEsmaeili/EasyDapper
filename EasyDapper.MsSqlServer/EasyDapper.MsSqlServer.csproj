@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>1.1.0</Version>
+    <Authors>杨斌</Authors>
+    <Company />
+    <Product>SQL RepoEx</Product>
+    <Description>Implementation of SqlRepo for Microsoft SQL Server</Description>
+    <PackageProjectUrl>https://github.com/AzThinker/SqlRepoEx</PackageProjectUrl>
+    <PackageTags>sql, repository, builder, sql server</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyName>EasyDapper.MsSqlServer</AssemblyName>
+    <RootNamespace>EasyDapper.MsSqlServer</RootNamespace>
+  </PropertyGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="del   /S /Q  &quot;$(ProjectDir)&quot;*.nupkg" />
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EasyDapper\EasyDapper.Core.csproj" />
+  </ItemGroup>
+
+</Project>
