@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using EasyDapper.Abstractions;
 using EasyDapper.Core;
 using EasyDapper.Core.Abstractions;
-using EesyDapper.Core.CustomAttribute;
+using EasyDapper.Core.CustomAttribute;
 
 namespace EasyDapper.MsSqlServer
 {

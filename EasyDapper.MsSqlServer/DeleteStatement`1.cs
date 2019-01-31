@@ -1,15 +1,9 @@
-﻿// Decompiled with JetBrains decompiler
-// Type: SqlRepoEx.MsSqlServer.DeleteStatement`1
-// Assembly: SqlRepoEx.MsSqlServer, Version=2.2.5.0, Culture=neutral, PublicKeyToken=null
-// MVID: E8CD94CF-96EF-4129-BE7F-C7A630E6EE1D
-// Assembly location: C:\Users\Royan Developer\.nuget\packages\sqlrepoex.mssqlserver\2.2.5\lib\netstandard2.0\SqlRepoEx.MsSqlServer.dll
-
-using System;
+﻿using System;
 using System.Linq;
 using EasyDapper.Abstractions;
 using EasyDapper.Core;
 using EasyDapper.Core.Abstractions;
-using EesyDapper.Core.CustomAttribute;
+using EasyDapper.Core.CustomAttribute;
 
 namespace EasyDapper.MsSqlServer
 {
@@ -28,9 +22,9 @@ namespace EasyDapper.MsSqlServer
 
         public override string Sql()
         {
-            if (entity != null && typeof(TEntity).GetProperties().Where(p => p.IsKeyField<TEntity>()).Count() == 0)
+            if (entity != null && !typeof(TEntity).GetProperties().Any(p => p.IsKeyField<TEntity>()))
                 throw new InvalidOperationException("以实例删除时，实例类必需至少有一个属性标记为[Key] 特性！");
-            return string.Format("DELETE [{0}].[{1}]{2};", TableSchema, TableName, GetWhereClause());
+            return $"DELETE [{TableSchema}].[{TableName}]{GetWhereClause()};";
         }
 
         private string GetWhereClause()

@@ -9,7 +9,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Atk.AtkExpression;
 using EasyDapper.Core;
-using EesyDapper.Core.CustomAttribute;
+using EasyDapper.Core.CustomAttribute;
 
 namespace EasyDapper.MsSqlServer
 {

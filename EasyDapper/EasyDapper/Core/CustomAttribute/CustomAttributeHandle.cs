@@ -1,12 +1,11 @@
-﻿using EasyDapper.Core.CustomAttribute;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
 
-namespace EesyDapper.Core.CustomAttribute
+namespace EasyDapper.Core.CustomAttribute
 {
     public static class CustomAttributeHandle
     {
@@ -22,14 +21,12 @@ namespace EesyDapper.Core.CustomAttribute
         public static string ColumnName(this PropertyInfo propertyInfo)
         {
             var customAttribute = propertyInfo.GetCustomAttribute(typeof(ColumnAttribute));
-            if (customAttribute != null)
-                return ((ColumnAttribute) customAttribute).Name;
-            return propertyInfo.Name;
+            return customAttribute != null ? ((ColumnAttribute) customAttribute).Name : propertyInfo.Name;
         }
 
         public static string ColumnName<TEntity>(this string propertyName)
         {
-            var element = typeof(TEntity).GetProperties().Where(p => p.Name == propertyName).FirstOrDefault();
+            var element = typeof(TEntity).GetProperties().FirstOrDefault(p => p.Name == propertyName);
             if (element == null)
                 return propertyName;
             var customAttribute = element.GetCustomAttribute(typeof(ColumnAttribute));
@@ -40,10 +37,8 @@ namespace EesyDapper.Core.CustomAttribute
 
         public static string IdentityFieldStr<TEntity>(string oldId)
         {
-            var propertyInfo = typeof(TEntity).GetProperties().Where(p => p.IsIdField()).FirstOrDefault();
-            if (propertyInfo != null)
-                return propertyInfo.Name;
-            return oldId;
+            var propertyInfo = typeof(TEntity).GetProperties().FirstOrDefault(p => p.IsIdField());
+            return propertyInfo != null ? propertyInfo.Name : oldId;
         }
 
         public static bool IsIdentityField<TEntity>(string oldId)
@@ -56,24 +51,27 @@ namespace EesyDapper.Core.CustomAttribute
             }).FirstOrDefault() != null;
         }
 
-        [Obsolete("拼写错误，请使用 IdentityFieldStr()")]
+        [Obsolete("Obsolete, Use IdentityFieldStr()")]
         public static string IdentityFiledStr<TEntity>(string oldId)
         {
-            var propertyInfo = typeof(TEntity).GetProperties().Where(p => p.IsIdField()).FirstOrDefault();
-            if (propertyInfo != null)
-                return propertyInfo.Name;
-            return oldId;
+            var propertyInfo = typeof(TEntity).GetProperties().FirstOrDefault(p => p.IsIdField());
+            return propertyInfo != null ? propertyInfo.Name : oldId;
         }
 
-        public static bool IsNonDBField(this PropertyInfo propertyInfo)
+        public static bool IsNonDbField(this PropertyInfo propertyInfo)
         {
             return propertyInfo.GetCustomAttribute(typeof(NonDatabaseFieldAttribute)) != null ||
                    propertyInfo.GetCustomAttribute(typeof(NotMappedAttribute)) != null;
         }
-
-        public static bool IsDBField(this PropertyInfo propertyInfo)
+        /// <summary>
+        /// By default, all properties of a class are considered to be database columns. But it can be customized with this attribute
+        /// </summary>
+        /// <param name="propertyInfo"></param>
+        /// <returns></returns>
+        public static bool IsDbField(this PropertyInfo propertyInfo)
         {
-            return propertyInfo.GetCustomAttribute(typeof(SqlRepoDbFieldAttribute)) != null;
+            return true;
+          //  return propertyInfo.GetCustomAttribute(typeof(SqlRepoDbFieldAttribute)) != null;
         }
 
         public static bool IsKeyField<TEntity>(this PropertyInfo propertyInfo)
@@ -86,34 +84,27 @@ namespace EesyDapper.Core.CustomAttribute
 
         public static bool IsKeyField<TEntity>(string oldId)
         {
-            return typeof(TEntity).GetProperties().Where(p => p.IsKeyField<TEntity>()).FirstOrDefault() != null;
+            return typeof(TEntity).GetProperties().FirstOrDefault(p => p.IsKeyField<TEntity>()) != null;
         }
 
         public static string FirstKeyFieldStr<TEntity>(string oldId)
         {
-            var propertyInfo = typeof(TEntity).GetProperties().Where(p => p.IsKeyField<TEntity>()).FirstOrDefault();
-            if (propertyInfo != null)
-                return propertyInfo.Name;
-            return oldId;
+            var propertyInfo = typeof(TEntity).GetProperties().FirstOrDefault(p => p.IsKeyField<TEntity>());
+            return propertyInfo != null ? propertyInfo.Name : oldId;
         }
 
         public static List<string> ListKeyFieldStr<TEntity>()
         {
-            var stringList = new List<string>();
-            foreach (var propertyInfo in typeof(TEntity).GetProperties().Where(p => p.IsKeyField<TEntity>()))
-                stringList.Add(propertyInfo.Name);
-            return stringList;
+            return typeof(TEntity).GetProperties().Where(p => p.IsKeyField<TEntity>()).Select(propertyInfo => propertyInfo.Name).ToList();
         }
 
         public static string DbTableName<TEntity>()
         {
             var customAttribute1 = typeof(TEntity).GetCustomAttribute(typeof(TableAttribute));
             if (customAttribute1 != null)
-                return (customAttribute1 as TableAttribute).Name;
+                return (customAttribute1 as TableAttribute)?.Name;
             var customAttribute2 = typeof(TEntity).GetCustomAttribute(typeof(TableNameAttribute));
-            if (customAttribute2 != null)
-                return (customAttribute2 as TableNameAttribute).TableName;
-            return typeof(TEntity).Name;
+            return customAttribute2 != null ? (customAttribute2 as TableNameAttribute)?.TableName : typeof(TEntity).Name;
         }
 
         public static bool IdKeyIsExclude<TEntity>()
@@ -121,27 +112,23 @@ namespace EesyDapper.Core.CustomAttribute
             if (typeof(TEntity).GetCustomAttribute(typeof(TableAttribute)) != null)
                 return false;
             var customAttribute = typeof(TEntity).GetCustomAttribute(typeof(TableNameAttribute));
-            if (customAttribute != null)
-                return (customAttribute as TableNameAttribute).ExcludeIdKey;
-            return false;
+            return customAttribute != null && ((TableNameAttribute) customAttribute).ExcludeIdKey;
         }
 
         public static string DbTableSchema<TEntity>()
         {
             var customAttribute = typeof(TEntity).GetCustomAttribute(typeof(TableSchemaAttribute));
-            if (customAttribute != null)
-                return (customAttribute as TableSchemaAttribute).TableSchema;
-            return "dbo";
+            return customAttribute != null ? (customAttribute as TableSchemaAttribute)?.TableSchema : "dbo";
         }
 
         public static string DbTableName<TEntity>(this TEntity entity)
         {
             var customAttribute1 = typeof(TEntity).GetCustomAttribute(typeof(TableAttribute));
             if (customAttribute1 != null)
-                return (customAttribute1 as TableAttribute).Name;
+                return (customAttribute1 as TableAttribute)?.Name;
             var customAttribute2 = typeof(TEntity).GetCustomAttribute(typeof(TableNameAttribute));
             if (customAttribute2 != null)
-                return (customAttribute2 as TableNameAttribute).TableName;
+                return (customAttribute2 as TableNameAttribute)?.TableName;
             return typeof(TEntity).Name;
         }
 
@@ -149,10 +136,10 @@ namespace EesyDapper.Core.CustomAttribute
         {
             var customAttribute1 = typeof(TEntity).GetCustomAttribute(typeof(TableAttribute));
             if (customAttribute1 != null)
-                return (customAttribute1 as TableAttribute).Schema;
+                return (customAttribute1 as TableAttribute)?.Schema;
             var customAttribute2 = typeof(TEntity).GetCustomAttribute(typeof(TableSchemaAttribute));
             if (customAttribute2 != null)
-                return (customAttribute2 as TableSchemaAttribute).TableSchema;
+                return (customAttribute2 as TableSchemaAttribute)?.TableSchema;
             return "dbo";
         }
     }

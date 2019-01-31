@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using EasyDapper.Abstractions;
-using EesyDapper.Core.CustomAttribute;
+using EasyDapper.Core.CustomAttribute;
 
 namespace EasyDapper
 {
@@ -51,7 +51,7 @@ namespace EasyDapper
 
         public bool TestIsDbField(PropertyInfo propertyInfo)
         {
-            return Test(propertyInfo.PropertyType) && propertyInfo.IsDBField() && !propertyInfo.IsNonDBField();
+            return Test(propertyInfo.PropertyType) && propertyInfo.IsDbField() && !propertyInfo.IsNonDbField();
         }
     }
 }

@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using EasyDapper.Abstractions;
 using EasyDapper.Core;
 using EasyDapper.Core.Abstractions;
-using EesyDapper.Core.CustomAttribute;
+using EasyDapper.Core.CustomAttribute;
 
 namespace EasyDapper.MsSqlServer
 {
@@ -36,19 +37,27 @@ namespace EasyDapper.MsSqlServer
 
         protected override string GetSetClauseFromEntity(string perParam)
         {
-            return FormatColumnValuePairs(!string.IsNullOrWhiteSpace(perParam)
-                ? typeof(TEntity).GetProperties().Where(p =>
+            IEnumerable<string> columnValuePairs;
+            if (!string.IsNullOrWhiteSpace(perParam))
+                columnValuePairs = typeof(TEntity).GetProperties().Where(p =>
                 {
                     if (!p.IsIdField() && p.CanWrite)
                         return writablePropertyMatcher.TestIsDbField(p);
                     return false;
-                }).Select(p => p.ColumnName() + "  = @" + p.Name)
-                : typeof(TEntity).GetProperties().Where(p =>
+                }).Select(p => p.ColumnName() + "  = @" + p.Name);
+            else
+            {
+                var columnValuePairs2 = typeof(TEntity).GetProperties().Where(p =>
                 {
                     if (!p.IsIdField() && p.CanWrite)
                         return writablePropertyMatcher.TestIsDbField(p);
                     return false;
-                }).Select(p => "[" + p.ColumnName() + "] = " + FormatValue(p.GetValue(entity)) ?? ""));
+                });
+                columnValuePairs=columnValuePairs2.Select(p => "[" + p.ColumnName() + "] = " + FormatValue(p.GetValue(entity)) ?? "");
+            }
+
+
+            return FormatColumnValuePairs(columnValuePairs);
         }
 
         protected override string GetSetClauseFromSelectors(string perParam)

@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Atk.AtkExpression;
 using EasyDapper.Abstractions;
-using EesyDapper.Core.CustomAttribute;
+using EasyDapper.Core.CustomAttribute;
 
 namespace EasyDapper.Core
 {
