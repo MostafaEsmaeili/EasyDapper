@@ -1,9 +1,8 @@
 ﻿namespace EasyDapper.Abstractions
 {
-  public interface IClauseBuilder
-  {
-    string Sql();
-
-    bool IsClean { get; set; }
-  }
+    public interface IClauseBuilder
+    {
+        bool IsClean { get; set; }
+        string Sql();
+    }
 }

@@ -4,24 +4,24 @@ using System.Threading.Tasks;
 
 namespace EasyDapper.Core.Abstractions
 {
-  public interface ISqlCommand : IDisposable
-  {
-    int CommandTimeout { get; set; }
+    public interface ISqlCommand : IDisposable
+    {
+        int CommandTimeout { get; set; }
 
-    CommandType CommandType { get; set; }
+        CommandType CommandType { get; set; }
 
-    string CommandText { get; set; }
+        string CommandText { get; set; }
 
-    ISqlParameterCollection Parameters { get; }
+        ISqlParameterCollection Parameters { get; }
 
-    int ExecuteNonQuery();
+        int ExecuteNonQuery();
 
-    Task<int> ExecuteNonQueryAsync();
+        Task<int> ExecuteNonQueryAsync();
 
-    IDataReader ExecuteReader(CommandBehavior closeConnection);
+        IDataReader ExecuteReader(CommandBehavior closeConnection);
 
-    IDataReader ExecuteReader();
+        IDataReader ExecuteReader();
 
-    Task<IDataReader> ExecuteReaderAsync(CommandBehavior closeConnection);
-  }
+        Task<IDataReader> ExecuteReaderAsync(CommandBehavior closeConnection);
+    }
 }

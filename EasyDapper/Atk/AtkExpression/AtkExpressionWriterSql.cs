@@ -25,34 +25,26 @@ namespace Atk.AtkExpression
             '\\'
         };
 
-        private string _tableAlias = "_table_Alias_";
         private string _leftbracket = "";
         private string _rightbracket = "";
-        private int indent = 2;
-        private int depth = 0;
-        private string atkWhereResult = string.Empty;
+
+        private readonly string _tableAlias = "_table_Alias_";
         private string atkOrdeRsult = string.Empty;
-        private int atkOrderTime;
-        private int atkWhereTime;
         private AtkExpSqlType atkRead = AtkExpSqlType.atkWhere;
-        private TextWriter writer;
-
-        public int AtkOrderTime
-        {
-            get { return atkOrderTime; }
-            set { atkOrderTime = value; }
-        }
-
-        public int AtkWhereTime
-        {
-            get { return atkWhereTime; }
-            set { atkWhereTime = value; }
-        }
+        private string atkWhereResult = string.Empty;
+        private readonly int depth = 0;
+        private readonly TextWriter writer;
 
         protected AtkExpressionWriterSql(TextWriter writer)
         {
             this.writer = writer;
         }
+
+        public int AtkOrderTime { get; set; }
+
+        public int AtkWhereTime { get; set; }
+
+        protected int IndentationWidth { get; set; } = 2;
 
         private static void Write(TextWriter writer, Expression expression)
         {
@@ -70,7 +62,7 @@ namespace Atk.AtkExpression
                 atkRead = atkSql
             };
             expressionWriterSql.Visit(expression);
-            string empty = string.Empty;
+            var empty = string.Empty;
             switch (atkSql)
             {
                 case AtkExpSqlType.atkWhere:
@@ -84,7 +76,7 @@ namespace Atk.AtkExpression
 
         private static string WriteToString(Expression expression)
         {
-            StringWriter stringWriter = new StringWriter();
+            var stringWriter = new StringWriter();
             Write(stringWriter, expression);
             return stringWriter.ToString();
         }
@@ -94,12 +86,6 @@ namespace Atk.AtkExpression
         {
             return Write(new StringWriter(), expression, atkSql, leftBracket, rightBracket).Replace("' + '", "")
                 .Replace("'+'", "");
-        }
-
-        protected int IndentationWidth
-        {
-            get { return indent; }
-            set { indent = value; }
         }
 
         protected void WriteLine(Indentation style)
@@ -277,18 +263,18 @@ namespace Atk.AtkExpression
 
         protected virtual string GetTypeName(Type type)
         {
-            string str = type.Name.Replace('+', '.');
-            int length1 = str.IndexOf('`');
+            var str = type.Name.Replace('+', '.');
+            var length1 = str.IndexOf('`');
             if (length1 > 0)
                 str = str.Substring(0, length1);
             if (type.IsGenericType || type.IsGenericTypeDefinition)
             {
-                StringBuilder stringBuilder = new StringBuilder();
+                var stringBuilder = new StringBuilder();
                 stringBuilder.Append(str);
                 stringBuilder.Append("<");
-                Type[] genericArguments = type.GetGenericArguments();
-                int index = 0;
-                for (int length2 = genericArguments.Length; index < length2; ++index)
+                var genericArguments = type.GetGenericArguments();
+                var index = 0;
+                for (var length2 = genericArguments.Length; index < length2; ++index)
                 {
                     if (index > 0)
                         stringBuilder.Append(",");
@@ -318,8 +304,8 @@ namespace Atk.AtkExpression
 
         protected override IEnumerable<MemberBinding> VisitBindingList(ReadOnlyCollection<MemberBinding> original)
         {
-            int index = 0;
-            for (int count = original.Count; index < count; ++index)
+            var index = 0;
+            for (var count = original.Count; index < count; ++index)
             {
                 VisitBinding(original[index]);
                 if (index < count - 1)
@@ -335,7 +321,9 @@ namespace Atk.AtkExpression
         protected override Expression VisitConstant(ConstantExpression c)
         {
             if (c.Value == null)
+            {
                 Write("null");
+            }
             else if (c.Type == typeof(DateTime))
             {
                 Write("'");
@@ -357,7 +345,7 @@ namespace Atk.AtkExpression
                         break;
                     case TypeCode.Single:
                     case TypeCode.Double:
-                        string str = c.Value.ToString();
+                        var str = c.Value.ToString();
                         if (!str.Contains('.'))
                             str += ".0";
                         Write(str);
@@ -386,8 +374,8 @@ namespace Atk.AtkExpression
             if (initializer.Arguments.Count > 1)
             {
                 Write("{");
-                int index = 0;
-                for (int count = initializer.Arguments.Count; index < count; ++index)
+                var index = 0;
+                for (var count = initializer.Arguments.Count; index < count; ++index)
                 {
                     Visit(initializer.Arguments[index]);
                     if (index < count - 1)
@@ -397,7 +385,9 @@ namespace Atk.AtkExpression
                 Write("}");
             }
             else
+            {
                 Visit(initializer.Arguments[0]);
+            }
 
             return initializer;
         }
@@ -405,8 +395,8 @@ namespace Atk.AtkExpression
         protected override IEnumerable<ElementInit> VisitElementInitializerList(
             ReadOnlyCollection<ElementInit> original)
         {
-            int index = 0;
-            for (int count = original.Count; index < count; ++index)
+            var index = 0;
+            for (var count = original.Count; index < count; ++index)
             {
                 VisitElementInitializer(original[index]);
                 if (index < count - 1)
@@ -421,8 +411,8 @@ namespace Atk.AtkExpression
 
         protected override ReadOnlyCollection<Expression> VisitExpressionList(ReadOnlyCollection<Expression> original)
         {
-            int index = 0;
-            for (int count = original.Count; index < count; ++index)
+            var index = 0;
+            for (var count = original.Count; index < count; ++index)
                 Visit(original[index]);
             return original;
         }
@@ -548,9 +538,13 @@ namespace Atk.AtkExpression
                 }
             }
             else if (IsRight)
+            {
                 Write("@" + m.Member.Name);
+            }
             else
+            {
                 Write(_tableAlias + _leftbracket + AtkTypeHelper.GetColumnAlias<T>(m.Member.Name) + _rightbracket);
+            }
 
             return base.VisitMemberAccess(m);
         }
@@ -598,12 +592,11 @@ namespace Atk.AtkExpression
 
         protected override Expression VisitMethodCall(MethodCallExpression m)
         {
-            string lower = m.Method.Name.ToLower();
-            string str1 = lower;
+            var lower = m.Method.Name.ToLower();
+            var str1 = lower;
             if (!(str1 == "where"))
             {
-                if (str1 == "orderby" || str1 == "orderbydescending" ||
-                    (str1 == "thenbydescending" || str1 == "thenby"))
+                if (str1 == "orderby" || str1 == "orderbydescending" || str1 == "thenbydescending" || str1 == "thenby")
                 {
                     if (atkRead == AtkExpSqlType.atkOrder)
                     {
@@ -629,15 +622,14 @@ namespace Atk.AtkExpression
             if (m.Arguments.Count <= 1)
                 ;
             if (m.Method.DeclaringType == typeof(string))
-            {
                 switch (m.Method.Name)
                 {
                     case "Concat":
                         IList<Expression> expressionList = m.Arguments;
                         if (expressionList.Count == 1 && expressionList[0].NodeType == ExpressionType.NewArrayInit)
                             expressionList = ((NewArrayExpression) expressionList[0]).Expressions;
-                        int index = 0;
-                        for (int count = expressionList.Count; index < count; ++index)
+                        var index = 0;
+                        for (var count = expressionList.Count; index < count; ++index)
                         {
                             if (index > 0)
                                 Write(" + ");
@@ -744,9 +736,7 @@ namespace Atk.AtkExpression
                         Write("))");
                         return m;
                 }
-            }
             else if (m.Method.DeclaringType == typeof(DateTime))
-            {
                 switch (m.Method.Name)
                 {
                     case "AddDays":
@@ -811,9 +801,7 @@ namespace Atk.AtkExpression
 
                         break;
                 }
-            }
-            else if (m.Method.DeclaringType == typeof(Decimal))
-            {
+            else if (m.Method.DeclaringType == typeof(decimal))
                 switch (m.Method.Name)
                 {
                     case "Add":
@@ -867,9 +855,7 @@ namespace Atk.AtkExpression
                         Write(", 0, 1)");
                         return m;
                 }
-            }
             else if (m.Method.DeclaringType == typeof(Math))
-            {
                 switch (m.Method.Name)
                 {
                     case "Abs":
@@ -934,7 +920,6 @@ namespace Atk.AtkExpression
                         Write(", 0, 1)");
                         return m;
                 }
-            }
 
             if (m.Method.Name == "ToString")
             {
@@ -945,7 +930,9 @@ namespace Atk.AtkExpression
                     Write(")");
                 }
                 else
+                {
                     Visit(m.Object);
+                }
 
                 return m;
             }
@@ -985,7 +972,7 @@ namespace Atk.AtkExpression
             base.VisitMethodCall(m);
             if (m.Arguments.Count > 1)
             {
-                string str2 = lower;
+                var str2 = lower;
                 if (str2 == "orderbydescending" || str2 == "thenbydescending")
                     atkOrdeRsult += " Desc";
                 if (atkRead == AtkExpSqlType.atkOrder)
@@ -1124,7 +1111,7 @@ namespace Atk.AtkExpression
 
         protected virtual string GetOperator(string methodName)
         {
-            string str = methodName;
+            var str = methodName;
             if (str == "Add")
                 return "+";
             if (str == "Subtract")

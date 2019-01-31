@@ -3,22 +3,27 @@ using System.Threading.Tasks;
 
 namespace EasyDapper.Abstractions
 {
-  public interface IExecuteProcedureStatement<TReturn>
-  {
-    IList<ParameterDefinition> ParameterDefinitions { get; }
+    public interface IExecuteProcedureStatement<TReturn>
+    {
+        IList<ParameterDefinition> ParameterDefinitions { get; }
 
-    TReturn Go();
+        TReturn Go();
 
-    Task<TReturn> GoAsync();
+        Task<TReturn> GoAsync();
 
-    IExecuteProcedureStatement<TReturn> WithName(string procedureName);
+        IExecuteProcedureStatement<TReturn> WithName(string procedureName);
 
-    IExecuteProcedureStatement<TReturn> WithParameter(string name, object value);
+        IExecuteProcedureStatement<TReturn> WithParameter(
+            string name,
+            object value);
 
-    IExecuteProcedureStatement<TReturn> WithParameter(ParameterDefinition parameter);
+        IExecuteProcedureStatement<TReturn> WithParameter(
+            ParameterDefinition parameter);
 
-    IExecuteProcedureStatement<TReturn> WithParameters(ParameterDefinition[] parameters);
+        IExecuteProcedureStatement<TReturn> WithParameters(
+            ParameterDefinition[] parameters);
 
-    IExecuteProcedureStatement<TReturn> UseConnectionProvider(IConnectionProvider connectionProvider);
-  }
+        IExecuteProcedureStatement<TReturn> UseConnectionProvider(
+            IConnectionProvider connectionProvider);
+    }
 }

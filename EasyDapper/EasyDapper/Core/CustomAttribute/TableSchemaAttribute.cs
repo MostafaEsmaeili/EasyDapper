@@ -2,22 +2,14 @@
 
 namespace EasyDapper.Core.CustomAttribute
 {
-  [AttributeUsage(AttributeTargets.Class)]
-  public class TableSchemaAttribute : Attribute
-  {
-    private string tableSchema;
-
-    public TableSchemaAttribute(string tableschema)
+    [AttributeUsage(AttributeTargets.Class)]
+    public class TableSchemaAttribute : Attribute
     {
-      tableSchema = tableschema;
-    }
+        public TableSchemaAttribute(string tableschema)
+        {
+            TableSchema = tableschema;
+        }
 
-    public string TableSchema
-    {
-      get
-      {
-        return tableSchema;
-      }
+        public string TableSchema { get; }
     }
-  }
 }

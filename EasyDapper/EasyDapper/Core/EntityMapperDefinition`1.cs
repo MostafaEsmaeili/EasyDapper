@@ -3,18 +3,18 @@ using System.Collections.Generic;
 
 namespace EasyDapper.Core
 {
-  public class EntityMapperDefinition<TEntity> where TEntity : class, new()
-  {
-    public EntityMapperDefinition()
+    public class EntityMapperDefinition<TEntity> where TEntity : class, new()
     {
-      PropertySetters = new Dictionary<string, Action<TEntity, object>>();
-      ColumnTypeMappings = new Dictionary<string, Type>();
+        public EntityMapperDefinition()
+        {
+            PropertySetters = new Dictionary<string, Action<TEntity, object>>();
+            ColumnTypeMappings = new Dictionary<string, Type>();
+        }
+
+        public Dictionary<string, Action<TEntity, object>> PropertySetters { get; set; }
+
+        public Dictionary<string, Type> ColumnTypeMappings { get; set; }
+
+        public EntityActivator<TEntity> Activator { get; set; }
     }
-
-    public Dictionary<string, Action<TEntity, object>> PropertySetters { get; set; }
-
-    public Dictionary<string, Type> ColumnTypeMappings { get; set; }
-
-    public EntityActivator<TEntity> Activator { get; set; }
-  }
 }

@@ -1,9 +1,9 @@
 ﻿namespace EasyDapper.Abstractions
 {
-  public interface IRepositoryFactory
-  {
-    IRepository<TEntity> Create<TEntity>() where TEntity : class, new();
+    public interface IRepositoryFactory
+    {
+        IRepository<TEntity> Create<TEntity>() where TEntity : class, new();
 
-    IRepository Create();
-  }
+        IRepository Create();
+    }
 }

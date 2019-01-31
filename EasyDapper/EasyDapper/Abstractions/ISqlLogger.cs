@@ -1,7 +1,7 @@
 ﻿namespace EasyDapper.Abstractions
 {
-  public interface ISqlLogger
-  {
-    void Log(string sql);
-  }
+    public interface ISqlLogger
+    {
+        void Log(string sql);
+    }
 }

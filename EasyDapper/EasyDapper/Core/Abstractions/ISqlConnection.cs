@@ -6,14 +6,14 @@ using EasyDapper.Abstractions;
 
 namespace EasyDapper.Core.Abstractions
 {
-  public interface ISqlConnection : IConnection, IDisposable
-  {
-    void Open();
+    public interface ISqlConnection : IConnection, IDisposable
+    {
+        void Open();
 
-    ISqlCommand CreateCommand(IDbTransaction dbTransaction = null);
+        ISqlCommand CreateCommand(IDbTransaction dbTransaction = null);
 
-    Task OpenAsync();
+        Task OpenAsync();
 
-    DbConnection GetDbConnection();
-  }
+        DbConnection GetDbConnection();
+    }
 }

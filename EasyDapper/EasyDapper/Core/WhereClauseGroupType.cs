@@ -1,9 +1,9 @@
 ﻿namespace EasyDapper.Core
 {
-  public enum WhereClauseGroupType
-  {
-    Where,
-    And,
-    Or
-  }
+    public enum WhereClauseGroupType
+    {
+        Where,
+        And,
+        Or
+    }
 }

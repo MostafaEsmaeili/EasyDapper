@@ -3,12 +3,12 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Version>1.1.0</Version>
-    <Authors>杨斌</Authors>
+    <Authors>Mostafa Esmaeili</Authors>
     <Company></Company>
-    <Product>SQL RepoEx</Product>
-    <Description>SQL Repo core components and interfaces.  Supports implementation of SQL statement builders that are made available within an implementation of the Repository pattern.
+    <Product>East Dapper</Product>
+    <Description>EasyDapper core components and interfaces.  Supports implementation of SQL statement builders that are made available within an implementation of the Repository pattern.
 </Description>
-    <PackageProjectUrl>https://github.com/AzThinker/SqlRepoEx</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/MostafaEsmaeili/EesyDapper</PackageProjectUrl>
     <PackageTags>
 sql, repository, builder</PackageTags>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -16,6 +16,7 @@ sql, repository, builder</PackageTags>
     <RootNamespace></RootNamespace>
     <AssemblyVersion>1.1.0.0</AssemblyVersion>
     <FileVersion>1.1.0.0</FileVersion>
+    <PackageId>EasyDapper.Core</PackageId>
   </PropertyGroup>
 
   <ItemGroup>

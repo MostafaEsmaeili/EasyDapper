@@ -2,22 +2,14 @@
 
 namespace EasyDapper.Core.CustomAttribute
 {
-  [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-  public class FieldNameAttribute : Attribute
-  {
-    private string _fieldname;
-
-    public FieldNameAttribute(string fieldname)
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+    public class FieldNameAttribute : Attribute
     {
-      _fieldname = fieldname;
-    }
+        public FieldNameAttribute(string fieldname)
+        {
+            Name = fieldname;
+        }
 
-    public string Name
-    {
-      get
-      {
-        return _fieldname;
-      }
+        public string Name { get; }
     }
-  }
 }

@@ -1,4 +1,10 @@
-﻿using System;
+﻿// Decompiled with JetBrains decompiler
+// Type: SqlRepoEx.MsSqlServer.Abstractions.MsSqlConnectionAdapter
+// Assembly: SqlRepoEx.MsSqlServer, Version=2.2.5.0, Culture=neutral, PublicKeyToken=null
+// MVID: E8CD94CF-96EF-4129-BE7F-C7A630E6EE1D
+// Assembly location: C:\Users\Royan Developer\.nuget\packages\sqlrepoex.mssqlserver\2.2.5\lib\netstandard2.0\SqlRepoEx.MsSqlServer.dll
+
+using System;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
@@ -8,50 +14,50 @@ using EasyDapper.Core.Abstractions;
 
 namespace EasyDapper.MsSqlServer.Abstractions
 {
-  public class MsSqlConnectionAdapter : ISqlConnection, IConnection, IDisposable
-  {
-    private readonly SqlConnection _connection;
-
-    public MsSqlConnectionAdapter(string connectionString)
+    public class MsSqlConnectionAdapter : ISqlConnection, IConnection, IDisposable
     {
-      _connection = new SqlConnection(connectionString);
-    }
+        private readonly SqlConnection connection;
 
-    public MsSqlConnectionAdapter()
-    {
-      _connection = new SqlConnection();
-    }
+        public MsSqlConnectionAdapter(string connectionString)
+        {
+            connection = new SqlConnection(connectionString);
+        }
 
-    public ISqlCommand CreateCommand(IDbTransaction dbTransaction = null)
-    {
-      var command = _connection.CreateCommand();
-      if (dbTransaction != null)
-        command.Transaction = (SqlTransaction) dbTransaction;
-      return new MsSqlCommandAdapter(command);
-    }
+        public MsSqlConnectionAdapter()
+        {
+            connection = new SqlConnection();
+        }
 
-    public void Dispose()
-    {
-      _connection.Dispose();
-    }
+        public ISqlCommand CreateCommand(IDbTransaction dbTransaction = null)
+        {
+            var command = connection.CreateCommand();
+            if (dbTransaction != null)
+                command.Transaction = (SqlTransaction) dbTransaction;
+            return new MsSqlCommandAdapter(command);
+        }
 
-    public void Open()
-    {
-      if (_connection.State != ConnectionState.Closed)
-        return;
-      _connection.Open();
-    }
+        public void Dispose()
+        {
+            connection?.Dispose();
+        }
 
-    public Task OpenAsync()
-    {
-      return _connection.OpenAsync();
-    }
+        public void Open()
+        {
+            if (connection.State != ConnectionState.Closed)
+                return;
+            connection.Open();
+        }
 
-    public DbConnection GetDbConnection()
-    {
-      if (_connection.State == ConnectionState.Closed)
-        Open();
-      return _connection;
+        public Task OpenAsync()
+        {
+            return connection.OpenAsync();
+        }
+
+        public DbConnection GetDbConnection()
+        {
+            if (connection.State == ConnectionState.Closed)
+                Open();
+            return connection;
+        }
     }
-  }
 }

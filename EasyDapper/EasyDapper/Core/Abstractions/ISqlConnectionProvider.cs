@@ -2,7 +2,7 @@
 
 namespace EasyDapper.Core.Abstractions
 {
-  public interface ISqlConnectionProvider : IConnectionProvider
-  {
-  }
+    public interface ISqlConnectionProvider : IConnectionProvider
+    {
+    }
 }

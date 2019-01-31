@@ -1,8 +1,8 @@
 ﻿namespace EasyDapper.Core
 {
-  public enum OrderByDirection
-  {
-    Ascending,
-    Descending
-  }
+    public enum OrderByDirection
+    {
+        Ascending,
+        Descending
+    }
 }

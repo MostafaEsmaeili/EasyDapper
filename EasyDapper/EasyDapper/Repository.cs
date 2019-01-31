@@ -4,53 +4,35 @@ using EasyDapper.Core.Abstractions;
 
 namespace EasyDapper
 {
-  public class Repository : IRepository
-  {
-    protected readonly IStatementFactory statementFactory;
-
-    public Repository(IStatementFactory statementFactory)
+    public class Repository : IRepository
     {
-      this.statementFactory = statementFactory;
-    }
+        protected readonly IStatementFactory statementFactory;
 
-    public IConnectionProvider GetConnectionProvider
-    {
-      get
-      {
-        return statementFactory.GetConnectionProvider;
-      }
-    }
+        public Repository(IStatementFactory statementFactory)
+        {
+            this.statementFactory = statementFactory;
+        }
 
-    public IDbConnection DbConnection
-    {
-      get
-      {
-        return GetConnectionProvider.GetDbConnection;
-      }
-    }
+        public IConnectionProvider GetConnectionProvider => statementFactory.GetConnectionProvider;
 
-    public IStatementExecutor StatementExecutor
-    {
-      get
-      {
-        return statementFactory.StatementExecutor;
-      }
-    }
+        public IDbConnection DbConnection => GetConnectionProvider.GetDbConnection;
 
-    public IExecuteNonQueryProcedureStatement ExecuteNonQueryProcedure()
-    {
-      return statementFactory.CreateExecuteNonQueryProcedure();
-    }
+        public IStatementExecutor StatementExecutor => statementFactory.StatementExecutor;
 
-    public IExecuteNonQuerySqlStatement ExecuteNonQuerySql()
-    {
-      return statementFactory.CreateExecuteNonQuerySql();
-    }
+        public IExecuteNonQueryProcedureStatement ExecuteNonQueryProcedure()
+        {
+            return statementFactory.CreateExecuteNonQueryProcedure();
+        }
 
-    public IRepository UseConnectionProvider(IConnectionProvider connectionProvider)
-    {
-      statementFactory.UseConnectionProvider(connectionProvider);
-      return this;
+        public IExecuteNonQuerySqlStatement ExecuteNonQuerySql()
+        {
+            return statementFactory.CreateExecuteNonQuerySql();
+        }
+
+        public IRepository UseConnectionProvider(IConnectionProvider connectionProvider)
+        {
+            statementFactory.UseConnectionProvider(connectionProvider);
+            return this;
+        }
     }
-  }
 }

@@ -1,9 +1,8 @@
 ﻿namespace EasyDapper.Abstractions
 {
-  public interface IStatementFactoryProvider
-  {
-    IStatementFactory Provide();
-
-    IConnectionProvider GetConnectionProvider { get; }
-  }
+    public interface IStatementFactoryProvider
+    {
+        IConnectionProvider GetConnectionProvider { get; }
+        IStatementFactory Provide();
+    }
 }

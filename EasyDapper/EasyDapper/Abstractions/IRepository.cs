@@ -9,18 +9,17 @@ using EasyDapper.Core.Abstractions;
 
 namespace EasyDapper.Abstractions
 {
-  public interface IRepository
-  {
-    IExecuteNonQueryProcedureStatement ExecuteNonQueryProcedure();
+    public interface IRepository
+    {
+        IConnectionProvider GetConnectionProvider { get; }
 
-    IExecuteNonQuerySqlStatement ExecuteNonQuerySql();
+        IDbConnection DbConnection { get; }
 
-    IRepository UseConnectionProvider(IConnectionProvider connectionProvider);
+        IStatementExecutor StatementExecutor { get; }
+        IExecuteNonQueryProcedureStatement ExecuteNonQueryProcedure();
 
-    IConnectionProvider GetConnectionProvider { get; }
+        IExecuteNonQuerySqlStatement ExecuteNonQuerySql();
 
-    IDbConnection DbConnection { get; }
-
-    IStatementExecutor StatementExecutor { get; }
-  }
+        IRepository UseConnectionProvider(IConnectionProvider connectionProvider);
+    }
 }

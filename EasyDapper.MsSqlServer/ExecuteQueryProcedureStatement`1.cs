@@ -1,11 +1,17 @@
-﻿using System.Collections.Generic;
+﻿// Decompiled with JetBrains decompiler
+// Type: SqlRepoEx.MsSqlServer.ExecuteQueryProcedureStatement`1
+// Assembly: SqlRepoEx.MsSqlServer, Version=2.2.5.0, Culture=neutral, PublicKeyToken=null
+// MVID: E8CD94CF-96EF-4129-BE7F-C7A630E6EE1D
+// Assembly location: C:\Users\Royan Developer\.nuget\packages\sqlrepoex.mssqlserver\2.2.5\lib\netstandard2.0\SqlRepoEx.MsSqlServer.dll
+
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using EasyDapper.Abstractions;
 using EasyDapper.Core;
 using EasyDapper.Core.Abstractions;
-using EasyDapper.Core.CustomAttribute;
+using EesyDapper.Core.CustomAttribute;
 
 namespace EasyDapper.MsSqlServer
 {
@@ -13,17 +19,17 @@ namespace EasyDapper.MsSqlServer
         IExecuteQueryProcedureStatement<TEntity>, IExecuteProcedureStatement<IEnumerable<TEntity>>
         where TEntity : class, new()
     {
-        private readonly IEntityMapper _entityMapper;
-
-        protected string SchemaName { get; private set; } = "dbo";
+        private readonly IEntityMapper entityMapper;
 
         public ExecuteQueryProcedureStatement(
             IStatementExecutor commandExecutor,
             IEntityMapper entityMapper)
             : base(commandExecutor)
         {
-            _entityMapper = entityMapper;
+            this.entityMapper = entityMapper;
         }
+
+        protected string SchemaName { get; private set; } = "dbo";
 
         public override IEnumerable<TEntity> Go()
         {
@@ -35,7 +41,9 @@ namespace EasyDapper.MsSqlServer
             using (var reader = ParameterDefinitions.Any()
                 ? StatementExecutor.ExecuteStoredProcedure(name, ParameterDefinitions.ToArray())
                 : StatementExecutor.ExecuteStoredProcedure(name))
-                return _entityMapper.Map<TEntity>(reader);
+            {
+                return entityMapper.Map<TEntity>(reader);
+            }
         }
 
         public override async Task<IEnumerable<TEntity>> GoAsync()
@@ -47,15 +55,16 @@ namespace EasyDapper.MsSqlServer
             var procedureName = "[" + SchemaName + "].[" + ProcedureName + "]";
             IDataReader dataReader;
             if (ParameterDefinitions.Any())
-                dataReader = await StatementExecutor.ExecuteStoredProcedureAsync(procedureName,
-                    ParameterDefinitions.ToArray());
+                dataReader =
+                    await StatementExecutor.ExecuteStoredProcedureAsync(procedureName, ParameterDefinitions.ToArray());
             else
                 dataReader = await StatementExecutor.ExecuteStoredProcedureAsync(procedureName);
             var reader = dataReader;
+            dataReader = null;
             IEnumerable<TEntity> entities;
             try
             {
-                entities = _entityMapper.Map<TEntity>(reader);
+                entities = entityMapper.Map<TEntity>(reader);
             }
             finally
             {

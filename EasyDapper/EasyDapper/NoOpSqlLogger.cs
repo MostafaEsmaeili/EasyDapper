@@ -2,10 +2,10 @@
 
 namespace EasyDapper
 {
-  public class NoOpSqlLogger : ISqlLogWriter
-  {
-    public void Log(string sql)
+    public class NoOpSqlLogger : ISqlLogWriter
     {
+        public void Log(string sql)
+        {
+        }
     }
-  }
 }

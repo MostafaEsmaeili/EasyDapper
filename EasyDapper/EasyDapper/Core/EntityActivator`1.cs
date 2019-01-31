@@ -1,4 +1,4 @@
 ﻿namespace EasyDapper.Core
 {
-  public delegate T EntityActivator<T>();
+    public delegate T EntityActivator<T>();
 }

@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EasyDapper.Core", "EasyDapp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EasyDapper.MsSqlServer", "EasyDapper.MsSqlServer\EasyDapper.MsSqlServer.csproj", "{79005145-E385-45DD-BF1C-0A55336431D9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyDapper.Adapter.Dapper", "EasyDapper.Adapter.Dapper\EasyDapper.Adapter.Dapper.csproj", "{FCFCB14C-4052-48FB-B4D6-2EB49DC28732}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{79005145-E385-45DD-BF1C-0A55336431D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79005145-E385-45DD-BF1C-0A55336431D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79005145-E385-45DD-BF1C-0A55336431D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCFCB14C-4052-48FB-B4D6-2EB49DC28732}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCFCB14C-4052-48FB-B4D6-2EB49DC28732}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCFCB14C-4052-48FB-B4D6-2EB49DC28732}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCFCB14C-4052-48FB-B4D6-2EB49DC28732}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

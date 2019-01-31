@@ -1,4 +1,10 @@
-﻿using EasyDapper.Core;
+﻿// Decompiled with JetBrains decompiler
+// Type: SqlRepoEx.MsSqlServer.FilterCondition
+// Assembly: SqlRepoEx.MsSqlServer, Version=2.2.5.0, Culture=neutral, PublicKeyToken=null
+// MVID: E8CD94CF-96EF-4129-BE7F-C7A630E6EE1D
+// Assembly location: C:\Users\Royan Developer\.nuget\packages\sqlrepoex.mssqlserver\2.2.5\lib\netstandard2.0\SqlRepoEx.MsSqlServer.dll
+
+using EasyDapper.Core;
 
 namespace EasyDapper.MsSqlServer
 {
@@ -17,18 +23,15 @@ namespace EasyDapper.MsSqlServer
             var str3 = str2;
             if (Left == "_LambdaTree_")
                 return str1 + LambdaTree.Replace("_table_Alias_", str3 + ".");
-            if (Right != "NULL") return str1 + str3 + ".[" + Left + "] " + Operator + " " + Right;
-            switch (Operator)
+            if (Right == "NULL")
             {
-                case "=":
+                if (Operator == "=")
                     Operator = "IS";
-                    break;
-                case "<>":
+                else if (Operator == "<>")
                     Operator = "IS NOT";
-                    break;
             }
 
-            return str1 + str3 + ".[" + Left + "] " + Operator + " " + Right;
+            return str1 + "(" + str3 + ".[" + Left + "] " + Operator + " " + Right + ")";
         }
     }
 }

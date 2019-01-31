@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>1.1.0</Version>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Authors>Mostafa Esmaeili</Authors>
+    <Product>EasyDapper</Product>
+    <Description>Implementation of Dapper executor for Microsoft SQL Server</Description>
+    <PackageProjectUrl>https://github.com/MostafaEsmaeili/EesyDapper</PackageProjectUrl>
+    <PackageTags>sql, repository, builder, sql server, dapper</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="1.50.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EasyDapper\EasyDapper.Core.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,6 +1,6 @@
 ﻿namespace EasyDapper.Abstractions
 {
-  public interface IExecuteNonQuerySqlStatement : IExecuteSqlStatement<int>
-  {
-  }
+    public interface IExecuteNonQuerySqlStatement : IExecuteSqlStatement<int>
+    {
+    }
 }

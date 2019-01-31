@@ -2,28 +2,27 @@
 
 namespace EasyDapper.Abstractions
 {
-  public interface IStatementFactory
-  {
-    IDeleteStatement<TEntity> CreateDelete<TEntity>() where TEntity : class, new();
+    public interface IStatementFactory
+    {
+        IConnectionProvider GetConnectionProvider { get; }
 
-    IExecuteQueryProcedureStatement<TEntity> CreateExecuteQueryProcedure<TEntity>() where TEntity : class, new();
+        IStatementExecutor StatementExecutor { get; }
+        IDeleteStatement<TEntity> CreateDelete<TEntity>() where TEntity : class, new();
 
-    IExecuteNonQueryProcedureStatement CreateExecuteNonQueryProcedure();
+        IExecuteQueryProcedureStatement<TEntity> CreateExecuteQueryProcedure<TEntity>() where TEntity : class, new();
 
-    IExecuteQuerySqlStatement<TEntity> CreateExecuteQuerySql<TEntity>() where TEntity : class, new();
+        IExecuteNonQueryProcedureStatement CreateExecuteNonQueryProcedure();
 
-    IExecuteNonQuerySqlStatement CreateExecuteNonQuerySql();
+        IExecuteQuerySqlStatement<TEntity> CreateExecuteQuerySql<TEntity>() where TEntity : class, new();
 
-    IInsertStatement<TEntity> CreateInsert<TEntity>() where TEntity : class, new();
+        IExecuteNonQuerySqlStatement CreateExecuteNonQuerySql();
 
-    ISelectStatement<TEntity> CreateSelect<TEntity>() where TEntity : class, new();
+        IInsertStatement<TEntity> CreateInsert<TEntity>() where TEntity : class, new();
 
-    IUpdateStatement<TEntity> CreateUpdate<TEntity>() where TEntity : class, new();
+        ISelectStatement<TEntity> CreateSelect<TEntity>() where TEntity : class, new();
 
-    IStatementFactory UseConnectionProvider(IConnectionProvider connectionProvider);
+        IUpdateStatement<TEntity> CreateUpdate<TEntity>() where TEntity : class, new();
 
-    IConnectionProvider GetConnectionProvider { get; }
-
-    IStatementExecutor StatementExecutor { get; }
-  }
+        IStatementFactory UseConnectionProvider(IConnectionProvider connectionProvider);
+    }
 }

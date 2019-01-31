@@ -1,9 +1,15 @@
-﻿using System;
+﻿// Decompiled with JetBrains decompiler
+// Type: SqlRepoEx.MsSqlServer.FromClauseBuilder
+// Assembly: SqlRepoEx.MsSqlServer, Version=2.2.5.0, Culture=neutral, PublicKeyToken=null
+// MVID: E8CD94CF-96EF-4129-BE7F-C7A630E6EE1D
+// Assembly location: C:\Users\Royan Developer\.nuget\packages\sqlrepoex.mssqlserver\2.2.5\lib\netstandard2.0\SqlRepoEx.MsSqlServer.dll
+
+using System;
 using System.Linq;
 using System.Linq.Expressions;
 using Atk.AtkExpression;
 using EasyDapper.Core;
-using EasyDapper.Core.CustomAttribute;
+using EesyDapper.Core.CustomAttribute;
 
 namespace EasyDapper.MsSqlServer
 {
@@ -21,14 +27,12 @@ namespace EasyDapper.MsSqlServer
                 rightTableName = CustomAttributeHandle.DbTableName<TEntity>();
             if (string.IsNullOrWhiteSpace(rightTableSchema))
                 rightTableSchema = "dbo";
-            var tableSpecification = new TableSpecification
-            {
-                SpecificationType = specificationType,
-                RightSchema = rightTableSchema,
-                RightTable = rightTableName,
-                RightAlias = rightTableAlias,
-                RightType = typeof(TEntity)
-            };
+            var tableSpecification = new TableSpecification();
+            tableSpecification.SpecificationType = specificationType;
+            tableSpecification.RightSchema = rightTableSchema;
+            tableSpecification.RightTable = rightTableName;
+            tableSpecification.RightAlias = rightTableAlias;
+            tableSpecification.RightType = typeof(TEntity);
             currentTableSpecification = tableSpecification;
             if (leftTableType != null)
             {
@@ -63,19 +67,17 @@ namespace EasyDapper.MsSqlServer
             }
             else
             {
-                joinCondition = new JoinCondition
-                {
-                    LogicalOperator = logicalOperator,
-                    LeftTableAlias = currentTableSpecification.LeftAlias,
-                    LeftTableSchema = currentTableSpecification.LeftSchema,
-                    LeftTableName = currentTableSpecification.LeftTable,
-                    LeftIdentifier = GetMemberName(body.Left),
-                    RightTableAlias = currentTableSpecification.RightAlias,
-                    RightTableSchema = currentTableSpecification.RightSchema,
-                    RightTableName = currentTableSpecification.RightTable,
-                    RightIdentifier = GetMemberName(AtkPartialEvaluator.Eval(body.Right)),
-                    Operator = OperatorString(body.NodeType)
-                };
+                joinCondition = new JoinCondition();
+                joinCondition.LogicalOperator = logicalOperator;
+                joinCondition.LeftTableAlias = currentTableSpecification.LeftAlias;
+                joinCondition.LeftTableSchema = currentTableSpecification.LeftSchema;
+                joinCondition.LeftTableName = currentTableSpecification.LeftTable;
+                joinCondition.LeftIdentifier = GetMemberName(body.Left);
+                joinCondition.RightTableAlias = currentTableSpecification.RightAlias;
+                joinCondition.RightTableSchema = currentTableSpecification.RightSchema;
+                joinCondition.RightTableName = currentTableSpecification.RightTable;
+                joinCondition.RightIdentifier = GetMemberName(AtkPartialEvaluator.Eval(body.Right));
+                joinCondition.Operator = OperatorString(body.NodeType);
             }
 
             return joinCondition;

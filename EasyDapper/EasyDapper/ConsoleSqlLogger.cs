@@ -3,11 +3,11 @@ using EasyDapper.Abstractions;
 
 namespace EasyDapper
 {
-  public class ConsoleSqlLogger : ISqlLogWriter
-  {
-    public void Log(string sql)
+    public class ConsoleSqlLogger : ISqlLogWriter
     {
-      Console.WriteLine(sql);
+        public void Log(string sql)
+        {
+            Console.WriteLine(sql);
+        }
     }
-  }
 }

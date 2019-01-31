@@ -2,7 +2,8 @@
 
 namespace EasyDapper.Abstractions
 {
-  public interface IExecuteQueryProcedureStatement<TEntity> : IExecuteProcedureStatement<IEnumerable<TEntity>> where TEntity : class, new()
-  {
-  }
+    public interface IExecuteQueryProcedureStatement<TEntity> : IExecuteProcedureStatement<IEnumerable<TEntity>>
+        where TEntity : class, new()
+    {
+    }
 }

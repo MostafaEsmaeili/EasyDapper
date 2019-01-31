@@ -2,26 +2,26 @@
 
 namespace EasyDapper.Abstractions
 {
-  public interface IRepository<TEntity> : IRepository where TEntity : class, new()
-  {
-    IDeleteStatement<TEntity> Delete();
+    public interface IRepository<TEntity> : IRepository where TEntity : class, new()
+    {
+        IDeleteStatement<TEntity> Delete();
 
-    int Delete(TEntity entity);
+        int Delete(TEntity entity);
 
-    IExecuteQueryProcedureStatement<TEntity> ExecuteQueryProcedure();
+        IExecuteQueryProcedureStatement<TEntity> ExecuteQueryProcedure();
 
-    IExecuteQuerySqlStatement<TEntity> ExecuteQuerySql();
+        IExecuteQuerySqlStatement<TEntity> ExecuteQuerySql();
 
-    IInsertStatement<TEntity> Insert();
+        IInsertStatement<TEntity> Insert();
 
-    TEntity Insert(TEntity entity);
+        TEntity Insert(TEntity entity);
 
-    ISelectStatement<TEntity> Query();
+        ISelectStatement<TEntity> Query();
 
-    IEnumerable<TEntity> ResultsFrom(ISelectStatement<TEntity> query);
+        IEnumerable<TEntity> ResultsFrom(ISelectStatement<TEntity> query);
 
-    IUpdateStatement<TEntity> Update();
+        IUpdateStatement<TEntity> Update();
 
-    int Update(TEntity entity);
-  }
+        int Update(TEntity entity);
+    }
 }

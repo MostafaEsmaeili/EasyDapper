@@ -2,22 +2,23 @@
 
 namespace EasyDapper.Core.CustomAttribute
 {
-  [AttributeUsage(AttributeTargets.Class)]
-  public class TableNameAttribute : Attribute
-  {
-    private string tableName;
-
-    public TableNameAttribute(string tablename)
+    [AttributeUsage(AttributeTargets.Class)]
+    public class TableNameAttribute : Attribute
     {
-      tableName = tablename;
-    }
+        public TableNameAttribute(string tablename)
+        {
+            TableName = tablename;
+            ExcludeIdKey = false;
+        }
 
-    public string TableName
-    {
-      get
-      {
-        return tableName;
-      }
+        public TableNameAttribute(string tablename, bool excludeIdKey)
+        {
+            TableName = tablename;
+            ExcludeIdKey = excludeIdKey;
+        }
+
+        public bool ExcludeIdKey { get; }
+
+        public string TableName { get; }
     }
-  }
 }

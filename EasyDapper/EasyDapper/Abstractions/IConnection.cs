@@ -2,7 +2,7 @@
 
 namespace EasyDapper.Abstractions
 {
-  public interface IConnection : IDisposable
-  {
-  }
+    public interface IConnection : IDisposable
+    {
+    }
 }

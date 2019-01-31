@@ -2,8 +2,8 @@
 
 namespace EasyDapper.Core.CustomAttribute
 {
-  [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-  public class SqlRepoDbFieldAttribute : Attribute
-  {
-  }
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+    public class SqlRepoDbFieldAttribute : Attribute
+    {
+    }
 }

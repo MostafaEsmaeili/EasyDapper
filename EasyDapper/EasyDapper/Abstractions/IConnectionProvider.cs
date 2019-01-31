@@ -3,16 +3,16 @@ using System.Data.Common;
 
 namespace EasyDapper.Abstractions
 {
-  public interface IConnectionProvider
-  {
-    string GetConnectionString { get; }
+    public interface IConnectionProvider
+    {
+        string GetConnectionString { get; }
 
-    DbConnection GetDbConnection { get; }
+        DbConnection GetDbConnection { get; }
 
-    TConnection Provide<TConnection>() where TConnection : class, IConnection;
+        IDbTransaction GetDbTransaction { get; }
 
-    IDbTransaction BeginTransaction();
+        TConnection Provide<TConnection>() where TConnection : class, IConnection;
 
-    IDbTransaction GetDbTransaction { get; }
-  }
+        IDbTransaction BeginTransaction();
+    }
 }

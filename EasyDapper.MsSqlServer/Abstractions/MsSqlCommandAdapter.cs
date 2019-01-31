@@ -1,4 +1,10 @@
-﻿using System;
+﻿// Decompiled with JetBrains decompiler
+// Type: SqlRepoEx.MsSqlServer.Abstractions.MsSqlCommandAdapter
+// Assembly: SqlRepoEx.MsSqlServer, Version=2.2.5.0, Culture=neutral, PublicKeyToken=null
+// MVID: E8CD94CF-96EF-4129-BE7F-C7A630E6EE1D
+// Assembly location: C:\Users\Royan Developer\.nuget\packages\sqlrepoex.mssqlserver\2.2.5\lib\netstandard2.0\SqlRepoEx.MsSqlServer.dll
+
+using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
@@ -6,70 +12,70 @@ using EasyDapper.Core.Abstractions;
 
 namespace EasyDapper.MsSqlServer.Abstractions
 {
-  public class MsSqlCommandAdapter : ISqlCommand, IDisposable
-  {
-    private readonly SqlCommand _command;
-
-    public MsSqlCommandAdapter(SqlCommand command, ISqlParameterCollection parameters)
+    public class MsSqlCommandAdapter : ISqlCommand, IDisposable
     {
-      _command = command;
-      Parameters = parameters;
-    }
+        private readonly SqlCommand command;
 
-    public MsSqlCommandAdapter(SqlCommand command)
-    {
-      _command = command;
-      Parameters = new MsSqlParameterCollectionAdapter(_command.Parameters);
-    }
+        public MsSqlCommandAdapter(SqlCommand command, ISqlParameterCollection parameters)
+        {
+            this.command = command;
+            Parameters = parameters;
+        }
 
-    public string CommandText
-    {
-      get => _command.CommandText;
-      set => _command.CommandText = value;
-    }
+        public MsSqlCommandAdapter(SqlCommand command)
+        {
+            this.command = command;
+            Parameters = new MsSqlParameterCollectionAdapter(this.command.Parameters);
+        }
 
-    public int CommandTimeout
-    {
-      get => _command.CommandTimeout;
-      set => _command.CommandTimeout = value;
-    }
+        public string CommandText
+        {
+            get => command.CommandText;
+            set => command.CommandText = value;
+        }
 
-    public CommandType CommandType
-    {
-      get => _command.CommandType;
-      set => _command.CommandType = value;
-    }
+        public int CommandTimeout
+        {
+            get => command.CommandTimeout;
+            set => command.CommandTimeout = value;
+        }
 
-    public void Dispose()
-    {
-    }
+        public CommandType CommandType
+        {
+            get => command.CommandType;
+            set => command.CommandType = value;
+        }
 
-    public int ExecuteNonQuery()
-    {
-      return _command.ExecuteNonQuery();
-    }
+        public void Dispose()
+        {
+        }
 
-    public Task<int> ExecuteNonQueryAsync()
-    {
-      return _command.ExecuteNonQueryAsync();
-    }
+        public int ExecuteNonQuery()
+        {
+            return command.ExecuteNonQuery();
+        }
 
-    public IDataReader ExecuteReader(CommandBehavior commandBehavior)
-    {
-      return _command.ExecuteReader(commandBehavior);
-    }
+        public Task<int> ExecuteNonQueryAsync()
+        {
+            return command.ExecuteNonQueryAsync();
+        }
 
-    public async Task<IDataReader> ExecuteReaderAsync(CommandBehavior commandBehavior)
-    {
-      var sqlDataReader = await _command.ExecuteReaderAsync(commandBehavior);
-      return sqlDataReader;
-    }
+        public IDataReader ExecuteReader(CommandBehavior commandBehavior)
+        {
+            return command.ExecuteReader(commandBehavior);
+        }
 
-    public IDataReader ExecuteReader()
-    {
-      return _command.ExecuteReader();
-    }
+        public async Task<IDataReader> ExecuteReaderAsync(CommandBehavior commandBehavior)
+        {
+            var sqlDataReader = await command.ExecuteReaderAsync(commandBehavior);
+            return sqlDataReader;
+        }
 
-    public ISqlParameterCollection Parameters { get; }
-  }
+        public IDataReader ExecuteReader()
+        {
+            return command.ExecuteReader();
+        }
+
+        public ISqlParameterCollection Parameters { get; }
+    }
 }

@@ -1,6 +1,6 @@
 ﻿namespace EasyDapper.Core
 {
-  public abstract class SelectStatementJoinSpecificationBase
-  {
-  }
+    public abstract class SelectStatementJoinSpecificationBase
+    {
+    }
 }
