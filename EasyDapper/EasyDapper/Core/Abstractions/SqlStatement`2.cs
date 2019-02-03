@@ -11,20 +11,14 @@ namespace EasyDapper.Core.Abstractions
         protected SqlStatement(IStatementExecutor statementExecutor, IEntityMapper entityMapper,
             IWritablePropertyMatcher writablePropertyMatcher)
         {
-            var statementExecutor1 = statementExecutor;
-            if (statementExecutor1 == null)
-                throw new ArgumentNullException(nameof(statementExecutor));
-            StatementExecutor = statementExecutor1;
+           ;
+            StatementExecutor = statementExecutor ?? throw new ArgumentNullException(nameof(statementExecutor));
             var entityMapper1 = entityMapper;
-            if (entityMapper1 == null)
-                throw new ArgumentNullException(nameof(entityMapper));
-            EntityMapper = entityMapper1;
+            EntityMapper = entityMapper1 ?? throw new ArgumentNullException(nameof(entityMapper));
             TableSchema = CustomAttributeHandle.DbTableSchema<TEntity>();
             TableName = CustomAttributeHandle.DbTableName<TEntity>();
             var writablePropertyMatcher1 = writablePropertyMatcher;
-            if (writablePropertyMatcher1 == null)
-                throw new ArgumentNullException(nameof(writablePropertyMatcher));
-            WritablePropertyMatcher = writablePropertyMatcher1;
+            WritablePropertyMatcher = writablePropertyMatcher1 ?? throw new ArgumentNullException(nameof(writablePropertyMatcher));
         }
 
         protected IStatementExecutor StatementExecutor { get; }

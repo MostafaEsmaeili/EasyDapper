@@ -19,8 +19,8 @@ namespace EasyDapper.MsSqlServer
             var str4 = BuildOrderByClause();
             var str5 = BuildGroupByClause();
             var str6 = BuildHavingClause();
-            return BuildPageClause(string.Format("{0}{1}{2}{3}{4}{5}", (object) str1, (object) str2, (object) str3,
-                (object) str5, (object) str4, (object) str6));
+            return BuildPageClause(
+                $"{ str1}{ str2}{ str3}{ str5}{ str4}{ str6}");
         }
 
         public override string GetCountSqlString()
@@ -83,27 +83,25 @@ namespace EasyDapper.MsSqlServer
                 else
                 {
                     var distinct = Distinct;
-                    var flag = true;
+                    const bool flag = true;
                     str1 = !((distinct.GetValueOrDefault() == flag) & distinct.HasValue) ? Top.HasValue
-                            ?
-                            string.Format("TOP ({0}) ", Top)
+                            ? $"TOP ({Top}) "
                             : string.Empty :
-                        Top.HasValue ? string.Format("DISTINCT TOP ({0}) ", Top) : "DISTINCT ";
+                        Top.HasValue ? $"DISTINCT TOP ({Top}) " : "DISTINCT ";
                 }
             }
             else
             {
                 var distinct = Distinct;
-                var flag = true;
+                const bool flag = true;
                 str1 = !((distinct.GetValueOrDefault() == flag) & distinct.HasValue) ? Top.HasValue
-                        ?
-                        string.Format("TOP ({0}) ", Top)
+                        ? $"TOP ({Top}) "
                         : string.Empty :
-                    Top.HasValue ? string.Format("DISTINCT TOP ({0}) ", Top) : "DISTINCT ";
+                    Top.HasValue ? $"DISTINCT TOP ({Top}) " : "DISTINCT ";
             }
 
             var str4 = string.Join("\n, ", Columns.Select(c => c.ToString()).ToArray());
-            return string.Format("SELECT {0}{1}{2}", str1, str2, string.IsNullOrEmpty(str4) ? "*" : str4);
+            return $"SELECT {str1}{str2}{(string.IsNullOrEmpty(str4) ? "*" : str4)}";
         }
 
         protected override string BuildPageOrderByClause()

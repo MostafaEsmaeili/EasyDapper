@@ -29,10 +29,10 @@ namespace EasyDapper.MsSqlServer
                     "For cannot be used ParamSet have been used, please create a new command.");
             if (entity == null && !setSelectors.Any())
                 throw new InvalidOperationException("不能在未使用Set或For初始化的语句上使用。");
-            if (entity != null && typeof(TEntity).GetProperties().Where(p => p.IsKeyField<TEntity>()).Count() == 0)
+            if (entity != null && !typeof(TEntity).GetProperties().Any(p => p.IsKeyField<TEntity>()))
                 throw new InvalidOperationException("以实例更新时，实例类必需至少有一个属性标记为[Key] 特性！");
-            return string.Format("UPDATE [{0}].[{1}]\nSET {2}{3};", (object) GetTableSchema(), (object) GetTableName(),
-                (object) GetSetClause(""), (object) GetWhereClause(""));
+            return
+                $"UPDATE [{(object) GetTableSchema()}].[{(object) GetTableName()}]\nSET {(object) GetSetClause("")}{(object) GetWhereClause("")};";
         }
 
         protected override string GetSetClauseFromEntity(string perParam)
