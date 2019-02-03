@@ -7,8 +7,11 @@ namespace EasyDapper.Core.Abstractions
     public interface IStatementExecutor
     {
         int ExecuteNonQuery(string sql);
+        int ExecuteNonQuery<T>(string sql,T parameter);
 
         Task<int> ExecuteNonQueryAsync(string sql);
+        Task<int> ExecuteNonQueryAsync<T>(string sql,T parameter);
+
 
         int ExecuteNonQueryStoredProcedure(string name, params ParameterDefinition[] parameterDefinitions);
 

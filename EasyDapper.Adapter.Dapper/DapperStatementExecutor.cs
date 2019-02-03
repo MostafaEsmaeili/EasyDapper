@@ -24,9 +24,22 @@ namespace SqlRepoEx.Adapter.Dapper
             return dbConnection.Execute(sql, null, null, new int?(), new CommandType?());
         }
 
+        public int ExecuteNonQuery<T>(string sql, T parameter)
+        {
+            var dynamicParameters = new DynamicParameters(parameter);
+            return dbConnection.Execute(sql, dynamicParameters, null, new int?(), new CommandType?());
+
+        }
+
         public Task<int> ExecuteNonQueryAsync(string sql)
         {
             return dbConnection.ExecuteAsync(sql, null, null, new int?(), new CommandType?());
+        }
+
+        public Task<int> ExecuteNonQueryAsync<T>(string sql, T parameter)
+        {
+            var dynamicParameters = new DynamicParameters(parameter);
+            return dbConnection.ExecuteAsync(sql, dynamicParameters, null, new int?(), new CommandType?());
         }
 
         public int ExecuteNonQueryStoredProcedure(

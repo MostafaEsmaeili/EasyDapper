@@ -35,6 +35,11 @@ namespace EasyDapper.Core
             }
         }
 
+        public int ExecuteNonQuery<T>(string sql, T parameter)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<int> ExecuteNonQueryAsync(string sql)
         {
             LogQuery(sql);
@@ -52,6 +57,11 @@ namespace EasyDapper.Core
             }
 
             return num;
+        }
+
+        public Task<int> ExecuteNonQueryAsync<T>(string sql, T parameter)
+        {
+            throw new NotImplementedException();
         }
 
         public int ExecuteNonQueryStoredProcedure(

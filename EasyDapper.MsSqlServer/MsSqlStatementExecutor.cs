@@ -29,7 +29,7 @@ namespace EasyDapper.MsSqlServer
                 var p = dataParameter;
                 if (p.Direction > ParameterDirection.Input)
                 {
-                    var parameterDefinition = parameters.Where(m => m.Name == p.ParameterName).FirstOrDefault();
+                    var parameterDefinition = parameters.FirstOrDefault(m => m.Name == p.ParameterName);
                     if (parameterDefinition != null)
                         parameterDefinition.Value = p.Value;
                 }

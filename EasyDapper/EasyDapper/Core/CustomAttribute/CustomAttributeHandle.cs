@@ -117,8 +117,8 @@ namespace EasyDapper.Core.CustomAttribute
 
         public static string DbTableSchema<TEntity>()
         {
-            var customAttribute = typeof(TEntity).GetCustomAttribute(typeof(TableSchemaAttribute));
-            return customAttribute != null ? (customAttribute as TableSchemaAttribute)?.TableSchema : "dbo";
+            var customAttribute = typeof(TEntity).GetCustomAttribute(typeof(TableAttribute));
+            return customAttribute != null ? (customAttribute as TableAttribute)?.Schema : "dbo";
         }
 
         public static string DbTableName<TEntity>(this TEntity entity)
@@ -132,15 +132,6 @@ namespace EasyDapper.Core.CustomAttribute
             return typeof(TEntity).Name;
         }
 
-        public static string DbTableSchemae<TEntity>(this TEntity entity)
-        {
-            var customAttribute1 = typeof(TEntity).GetCustomAttribute(typeof(TableAttribute));
-            if (customAttribute1 != null)
-                return (customAttribute1 as TableAttribute)?.Schema;
-            var customAttribute2 = typeof(TEntity).GetCustomAttribute(typeof(TableSchemaAttribute));
-            if (customAttribute2 != null)
-                return (customAttribute2 as TableSchemaAttribute)?.TableSchema;
-            return "dbo";
-        }
+      
     }
 }

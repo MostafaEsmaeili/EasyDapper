@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 using EasyDapper.Abstractions;
 using EasyDapper.Core.Abstractions;
@@ -55,16 +56,15 @@ namespace EasyDapper.Core
 
         public override int Go()
         {
-            if (paramSetMode)
-                throw new InvalidOperationException(
-                    "For cannot be used ParamSet have been used, please create a new command.");
-            return StatementExecutor.ExecuteNonQuery(Sql());
+            var (item1, item2) = ParamSqlWithEntity();
+            return StatementExecutor.ExecuteNonQuery(item1, item2);
         }
+
 
         public override async Task<int> GoAsync()
         {
-            var num = await StatementExecutor.ExecuteNonQueryAsync(Sql());
-            return num;
+            var (item1, item2) = ParamSqlWithEntity();
+            return await StatementExecutor.ExecuteNonQueryAsync(item1, item2);
         }
 
         public IUpdateStatement<TEntity> NestedAnd(
