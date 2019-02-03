@@ -30,7 +30,7 @@ namespace Atk.AtkExpression
 
         private readonly string _tableAlias = "_table_Alias_";
         private string atkOrdeRsult = string.Empty;
-        private AtkExpSqlType atkRead = AtkExpSqlType.atkWhere;
+        private AtkExpSqlType atkRead = AtkExpSqlType.AtkWhere;
         private string atkWhereResult = string.Empty;
         private readonly int depth = 0;
         private readonly TextWriter writer;
@@ -62,12 +62,25 @@ namespace Atk.AtkExpression
                 atkRead = atkSql
             };
             expressionWriterSql.Visit(expression);
+            if (expression is LambdaExpression lambda)
+            {
+                var body = lambda.Body as BinaryExpression;
+                if (body != null && body.Left.NodeType == ExpressionType.Constant)
+                {
+
+                }
+                if (body != null && body.Right.NodeType == ExpressionType.Constant)
+                {
+
+                }
+            }
+
             var empty = string.Empty;
             switch (atkSql)
             {
-                case AtkExpSqlType.atkWhere:
+                case AtkExpSqlType.AtkWhere:
                     return Regex.Replace(expressionWriterSql.atkWhereResult, "and\\s?$", "");
-                case AtkExpSqlType.atkOrder:
+                case AtkExpSqlType.AtkOrder:
                     return Regex.Replace(expressionWriterSql.atkOrdeRsult, ",\\s?$", "");
                 default:
                     return string.Empty;
@@ -97,10 +110,10 @@ namespace Atk.AtkExpression
         {
             switch (atkRead)
             {
-                case AtkExpSqlType.atkWhere:
+                case AtkExpSqlType.AtkWhere:
                     atkWhereResult += text;
                     break;
-                case AtkExpSqlType.atkOrder:
+                case AtkExpSqlType.AtkOrder:
                     atkOrdeRsult += text;
                     break;
             }
@@ -435,7 +448,7 @@ namespace Atk.AtkExpression
         {
             if (lambda.Body.NodeType == ExpressionType.MemberAccess)
             {
-                if (lambda.Body.Type == typeof(bool) && atkRead == AtkExpSqlType.atkWhere)
+                if (lambda.Body.Type == typeof(bool) && atkRead == AtkExpSqlType.AtkWhere)
                 {
                     Write(((MemberExpression) lambda.Body).Member.Name + " = 1");
                 }
@@ -598,7 +611,7 @@ namespace Atk.AtkExpression
             {
                 if (str1 == "orderby" || str1 == "orderbydescending" || str1 == "thenbydescending" || str1 == "thenby")
                 {
-                    if (atkRead == AtkExpSqlType.atkOrder)
+                    if (atkRead == AtkExpSqlType.AtkOrder)
                     {
                         ++AtkOrderTime;
                     }
@@ -609,7 +622,7 @@ namespace Atk.AtkExpression
                     }
                 }
             }
-            else if (atkRead == AtkExpSqlType.atkWhere)
+            else if (atkRead == AtkExpSqlType.AtkWhere)
             {
                 ++AtkWhereTime;
             }
@@ -975,7 +988,7 @@ namespace Atk.AtkExpression
                 var str2 = lower;
                 if (str2 == "orderbydescending" || str2 == "thenbydescending")
                     atkOrdeRsult += " Desc";
-                if (atkRead == AtkExpSqlType.atkOrder)
+                if (atkRead == AtkExpSqlType.AtkOrder)
                     atkOrdeRsult += ",";
                 else
                     atkWhereResult += " and ";

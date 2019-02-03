@@ -17,13 +17,13 @@ namespace EasyDapper.Core
         protected FilterGroupBase rootFilterGroup;
         protected bool whereAllreadyAdd;
 
-        public SelectStatementBase(
+        protected SelectStatementBase(
             IStatementExecutor statementExecutor,
             IEntityMapper entityMapper,
             IWritablePropertyMatcher writablePropertyMatcher)
             : base(statementExecutor, entityMapper, writablePropertyMatcher)
         {
-            InitialiseConfig();
+          //  InitialiseConfig();
         }
 
         public SelectStatementSpecificationBase Specification { get; protected set; }

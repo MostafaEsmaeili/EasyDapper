@@ -73,7 +73,7 @@ namespace EasyDapper.MsSqlServer
             return string.IsNullOrEmpty(TableSchema) ? "dbo" : TableSchema;
         }
 
-        protected override string GetWhereClause(string perParam = "")
+        protected override string GetWhereClause(string perParam)
         {
             if (entity != null)
             {
@@ -82,8 +82,7 @@ namespace EasyDapper.MsSqlServer
                         .Select(p => "(" + p.ColumnName() + "  = @" + p.Name + ")")
                     : typeof(TEntity).GetProperties().Where(p => p.IsKeyField<TEntity>()).Select(p =>
                         " ([" + p.ColumnName() + "] = " + FormatValue(p.GetValue(entity)) + ")");
-                if (columnValuePairs != null)
-                    return "\nWHERE " + FormatWhereValuePairs(columnValuePairs);
+                return "\nWHERE " + FormatWhereValuePairs(columnValuePairs);
             }
 
             var str = whereClauseBuilder.Sql();
@@ -92,15 +91,10 @@ namespace EasyDapper.MsSqlServer
 
         public override string ParamSql()
         {
-            if (entity != null && typeof(TEntity).GetProperties().Where(p =>
-            {
-                if (!p.IsKeyField<TEntity>())
-                    return p.IsIdField();
-                return true;
-            }).Count() == 0)
+            if (entity != null && !typeof(TEntity).GetProperties().Any(p => p.IsKeyField<TEntity>() || p.IsIdField()))
                 throw new InvalidOperationException("以实例更新时，实例类必需至少有一个属性标记为[KeyFiled] 特性！");
-            return string.Format("UPDATE [{0}].[{1}]\nSET {2}{3};", (object) GetTableSchema(), (object) GetTableName(),
-                (object) GetSetClause("@"), (object) GetWhereClause("@"));
+            return
+                $"UPDATE [{(object) GetTableSchema()}].[{(object) GetTableName()}]\nSET {(object) GetSetClause("@")}{(object) GetWhereClause("@")};";
         }
     }
 }

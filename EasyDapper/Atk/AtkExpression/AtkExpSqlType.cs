@@ -2,7 +2,7 @@
 {
     public enum AtkExpSqlType : byte
     {
-        atkWhere,
-        atkOrder
+        AtkWhere,
+        AtkOrder
     }
 }

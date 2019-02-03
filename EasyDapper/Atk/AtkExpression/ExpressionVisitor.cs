@@ -12,7 +12,7 @@ namespace Atk.AtkExpression
         protected virtual Expression Visit(Expression exp)
         {
             if (exp == null)
-                return exp;
+                return null;
             switch (exp.NodeType)
             {
                 case ExpressionType.Add:

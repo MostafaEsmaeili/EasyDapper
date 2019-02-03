@@ -23,12 +23,15 @@ namespace EasyDapper.MsSqlServer
             var str3 = str2;
             if (Left == "_LambdaTree_")
                 return str1 + LambdaTree.Replace("_table_Alias_", str3 + ".");
-            if (Right == "NULL")
+            if (Right != "NULL") return str1 + "(" + str3 + ".[" + Left + "] " + Operator + " " + Right + ")";
+            switch (Operator)
             {
-                if (Operator == "=")
+                case "=":
                     Operator = "IS";
-                else if (Operator == "<>")
+                    break;
+                case "<>":
                     Operator = "IS NOT";
+                    break;
             }
 
             return str1 + "(" + str3 + ".[" + Left + "] " + Operator + " " + Right + ")";

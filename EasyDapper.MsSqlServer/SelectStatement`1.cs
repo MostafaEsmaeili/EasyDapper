@@ -1,10 +1,4 @@
-﻿// Decompiled with JetBrains decompiler
-// Type: SqlRepoEx.MsSqlServer.SelectStatement`1
-// Assembly: SqlRepoEx.MsSqlServer, Version=2.2.5.0, Culture=neutral, PublicKeyToken=null
-// MVID: E8CD94CF-96EF-4129-BE7F-C7A630E6EE1D
-// Assembly location: C:\Users\Royan Developer\.nuget\packages\sqlrepoex.mssqlserver\2.2.5\lib\netstandard2.0\SqlRepoEx.MsSqlServer.dll
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -25,16 +19,16 @@ namespace EasyDapper.MsSqlServer
             IWritablePropertyMatcher writablePropertyMatcher)
             : base(statementExecutor, entityMapper, writablePropertyMatcher)
         {
-            InitialiseConfig();
+           InitialiseConfig();
         }
 
         public override ISelectStatement<TEntity> CountAll()
         {
             var columns = Specification.Columns;
-            var columnSpecification1 = new ColumnSpecification();
-            columnSpecification1.Identifier = "*";
-            columnSpecification1.Aggregation = Aggregation.Count;
-            columnSpecification1.EntityType = typeof(TEntity);
+            var columnSpecification1 = new ColumnSpecification
+            {
+                Identifier = "*", Aggregation = Aggregation.Count, EntityType = typeof(TEntity)
+            };
             var columnSpecification2 = columnSpecification1;
             columns.Add(columnSpecification2);
             return this;
@@ -167,17 +161,20 @@ namespace EasyDapper.MsSqlServer
             string alias = null,
             LogicalOperator logicalOperator = LogicalOperator.NotSet)
         {
-            var body = selector.Body as BinaryExpression;
+         
+
             var conditions = currentFilterGroup.Conditions;
-            var filterCondition1 = new FilterCondition();
-            filterCondition1.Alias = alias;
-            filterCondition1.EntityType = typeof(T);
-            filterCondition1.Left = "_LambdaTree_";
-            filterCondition1.LocigalOperator = logicalOperator;
-            filterCondition1.LambdaTree =
-                AtkExpressionWriterSql<T>.AtkWhereWriteToString(selector, AtkExpSqlType.atkWhere, "[", "]");
-            var filterCondition2 = filterCondition1;
-            conditions.Add(filterCondition2);
+            var filterCondition1 = new FilterCondition
+            {
+                Alias = alias,
+                EntityType = typeof(T),
+                Left = "_LambdaTree_",
+                LocigalOperator = logicalOperator,
+                LambdaTree =
+                    AtkExpressionWriterSql<T>.AtkWhereWriteToString(selector, AtkExpSqlType.AtkWhere, "[", "]")
+
+            };
+            conditions.Add(filterCondition1);
         }
 
         protected override void AddGroupSpecification<T>(
@@ -320,7 +317,7 @@ namespace EasyDapper.MsSqlServer
             tables.Add(tableSpecification2);
         }
 
-        protected override void InitialiseConfig()
+        protected sealed override void InitialiseConfig()
         {
             Specification = new SelectStatementSpecification();
             var type = typeof(TEntity);

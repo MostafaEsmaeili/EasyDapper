@@ -18,14 +18,16 @@ namespace EastDapper.UnitTest
 
             var f = repoFactory.Create<BankName>();
 
-            var u=f.Update().For(new BankName
-            {
-                CodeId = 21,
-                Title = "انصار2"
+            //var u=f.Update().For(new BankName
+            //{
+            //    CodeId = 21,
+            //    Title = "انصار2"
 
-            });
-            u.Go();
-
+            //});
+            //u.Go();
+            var s = 12;
+            var query = f.Query().Where(x => x.CodeId==s );
+            var select = query.Sql();
         }
     }
 

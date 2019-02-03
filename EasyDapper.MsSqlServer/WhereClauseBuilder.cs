@@ -59,15 +59,16 @@ namespace EasyDapper.MsSqlServer
             ThrowIfNotInitialised();
             IsClean = false;
             var conditions = currentGroup.Conditions;
-            var whereClauseCondition = new WhereClauseCondition();
-            whereClauseCondition.Alias = alias;
-            whereClauseCondition.LocigalOperator = locigalOperator;
-            whereClauseCondition.LeftTable =
-                string.IsNullOrWhiteSpace(tableName) ? TableNameFromType<TEntity>() : tableName;
-            whereClauseCondition.LeftSchema = string.IsNullOrWhiteSpace(tableSchema) ? "dbo" : tableSchema;
-            whereClauseCondition.Left = "_LambdaTree_";
-            whereClauseCondition.Right =
-                AtkExpressionWriterSql<TEntity>.AtkWhereWriteToString(expression, AtkExpSqlType.atkWhere, "[", "]");
+            var whereClauseCondition = new WhereClauseCondition
+            {
+                Alias = alias,
+                LocigalOperator = locigalOperator,
+                LeftTable = string.IsNullOrWhiteSpace(tableName) ? TableNameFromType<TEntity>() : tableName,
+                LeftSchema = string.IsNullOrWhiteSpace(tableSchema) ? "dbo" : tableSchema,
+                Left = "_LambdaTree_",
+                Right = AtkExpressionWriterSql<TEntity>.AtkWhereWriteToString(expression, AtkExpSqlType.AtkWhere, "[",
+                    "]")
+            };
             conditions.Add(whereClauseCondition);
             return this;
         }
