@@ -19,6 +19,10 @@ namespace Atk.AtkExpression
         return customAttribute.Name;
       return columnName;
     }
+    public static bool IsNullable(this Type type)
+    {
+        return Nullable.GetUnderlyingType(type) != null;
+    }
 
     public static Type FindIEnumerable(Type seqType)
     {

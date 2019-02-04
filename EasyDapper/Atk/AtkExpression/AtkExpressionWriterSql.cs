@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
+using EasyDapper;
 
 namespace Atk.AtkExpression
 {
@@ -54,7 +56,10 @@ namespace Atk.AtkExpression
         private static string Write(TextWriter writer, Expression expression, AtkExpSqlType atkSql, string leftBracket,
             string rightBracket)
         {
+
             expression = AtkPartialEvaluator.Eval(expression);
+            ParameterDefinition parameterDefinition;
+
             var expressionWriterSql = new AtkExpressionWriterSql<T>(writer)
             {
                 _leftbracket = leftBracket,
@@ -67,15 +72,29 @@ namespace Atk.AtkExpression
                 var body = lambda.Body as BinaryExpression;
                 if (body != null && body.Left.NodeType == ExpressionType.Constant)
                 {
+                    var b = body.Left as ConstantExpression;
 
+                    parameterDefinition = new ParameterDefinition
+                    {
+                        DbType = ClrTypeToSqlDbTypeMapper.GetSqlDbTypeFromClrType(body.Left.Type),
+                        Direction = ParameterDirection.Input,
+                        IsNullable = body.Left.Type.IsNullable(),
+
+                    };
+                    
                 }
                 if (body != null && body.Right.NodeType == ExpressionType.Constant)
                 {
-
+                    if (body.Right is ConstantExpression b)
+                        parameterDefinition = new ParameterDefinition
+                        {
+                            DbType = ClrTypeToSqlDbTypeMapper.GetSqlDbTypeFromClrType(body.Left.Type),
+                            Direction = ParameterDirection.Input,
+                            IsNullable = body.Left.Type.IsNullable(),
+                            Value = Convert.ChangeType(b.Value, body.Left.Type)
+                        };
                 }
             }
-
-            var empty = string.Empty;
             switch (atkSql)
             {
                 case AtkExpSqlType.AtkWhere:
@@ -85,6 +104,52 @@ namespace Atk.AtkExpression
                 default:
                     return string.Empty;
             }
+        }
+
+        private static Tuple<string, ParameterDefinition> WriteWithParameter(TextWriter writer, Expression expression, AtkExpSqlType atkSql, string leftBracket,
+            string rightBracket)
+        {
+
+            expression = AtkPartialEvaluator.Eval(expression);
+            ParameterDefinition parameterDefinition;
+            var expressionWriterSql = new AtkExpressionWriterSql<T>(writer)
+            {
+                _leftbracket = leftBracket,
+                _rightbracket = rightBracket,
+                atkRead = atkSql
+            };
+            expressionWriterSql.Visit(expression);
+            if (expression is LambdaExpression lambda)
+            {
+                var body = lambda.Body as BinaryExpression;
+                if (body != null && body.Left.NodeType == ExpressionType.Constant)
+                {
+                    var b = body.Left as ConstantExpression;
+
+                    parameterDefinition = new ParameterDefinition
+                    {
+                        DbType = ClrTypeToSqlDbTypeMapper.GetSqlDbTypeFromClrType(body.Left.Type),
+                        Direction = ParameterDirection.Input,
+                        IsNullable = body.Left.Type.IsNullable(),
+
+                    };
+                }
+                if (body != null && body.Right.NodeType == ExpressionType.Constant)
+                {
+
+                }
+            }
+
+            return null;
+            //switch (atkSql)
+            //{
+            //    case AtkExpSqlType.AtkWhere:
+            //        return Regex.Replace(expressionWriterSql.atkWhereResult, "and\\s?$", "");
+            //    case AtkExpSqlType.AtkOrder:
+            //        return Regex.Replace(expressionWriterSql.atkOrdeRsult, ",\\s?$", "");
+            //    default:
+            //        return string.Empty;
+            //}
         }
 
         private static string WriteToString(Expression expression)

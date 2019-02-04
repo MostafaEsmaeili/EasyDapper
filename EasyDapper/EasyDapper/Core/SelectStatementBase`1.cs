@@ -822,15 +822,13 @@ namespace EasyDapper.Core
         {
             if (whereAllreadyAdd)
             {
-                if (addnest)
-                    return NestedAnd(selector, alias);
-                return And(selector, alias);
+                return addnest ? NestedAnd(selector, alias) : And(selector, alias);
             }
 
             whereAllreadyAdd = true;
             ThrowIfTableNotSpecified<T>(alias);
             InitialiseFiltering();
-            AddFilterCondition(selector, alias, LogicalOperator.NotSet);
+            AddFilterCondition(selector, alias);
             return this;
         }
 
