@@ -42,7 +42,7 @@ namespace EasyDapper.MsSqlServer
             else
                 oldValue = "[" + TableName + "]";
             var input = GetNoSemicolonSql(Sql())
-                .Replace(Specification.Tables.FirstOrDefault().ToString(),
+                .Replace(Specification.Tables.FirstOrDefault()?.ToString(),
                     "\nFROM ( _replace_union_query )\nAS  _this_is_union").Replace(oldValue, " [_this_is_union]");
             var replacement = string.Empty;
             foreach (var sql in Sqls)
@@ -87,6 +87,7 @@ namespace EasyDapper.MsSqlServer
 
         public override string Sql()
         {
+            
             FinalizeColumnSpecifications();
             FinalizeJoinConditions();
             FinalizeWhereConditions(Specification.Filters);
@@ -95,7 +96,29 @@ namespace EasyDapper.MsSqlServer
             FinalizeHavings();
             return Specification.ToString();
         }
-
+        public override (string, List<PartialSelectSelectParameterDefinition>) SqlWithParams()
+        {
+            
+            FinalizeColumnSpecifications();
+            FinalizeJoinConditions();
+            FinalizeWhereConditions(Specification.Filters);
+            FinalizeGroupings();
+            FinalizeOrderings();
+            FinalizeHavings();
+            var sql= Specification.ToString();
+            var parameters = new List<PartialSelectSelectParameterDefinition>();
+            foreach (var f in Specification.Filters)
+            {
+                foreach (var condition in f.Conditions)
+                {
+                    if (condition.ParameterDefinitions.Any())
+                    {
+                        parameters.AddRange(condition.ParameterDefinitions);
+                    }
+                }
+            }
+            return (sql, parameters);
+        }
         protected override void AddBetweenFilterCondition<T, TMember>(
             Expression<Func<T, TMember>> selector,
             TMember start,
@@ -104,23 +127,27 @@ namespace EasyDapper.MsSqlServer
             LogicalOperator logicalOperator = LogicalOperator.NotSet)
         {
             var conditions1 = currentFilterGroup.Conditions;
-            var filterCondition1 = new FilterCondition();
-            filterCondition1.Alias = alias;
-            filterCondition1.EntityType = typeof(T);
-            filterCondition1.Operator = ">=";
-            filterCondition1.Left = GetMemberName(selector);
-            filterCondition1.LocigalOperator = logicalOperator;
-            filterCondition1.Right = FormatValue(start);
+            var filterCondition1 = new FilterCondition
+            {
+                Alias = alias,
+                EntityType = typeof(T),
+                Operator = ">=",
+                Left = GetMemberName(selector),
+                LocigalOperator = logicalOperator,
+                Right = FormatValue(start)
+            };
             var filterCondition2 = filterCondition1;
             conditions1.Add(filterCondition2);
             var conditions2 = currentFilterGroup.Conditions;
-            var filterCondition3 = new FilterCondition();
-            filterCondition3.Alias = alias;
-            filterCondition3.EntityType = typeof(T);
-            filterCondition3.Operator = "<=";
-            filterCondition3.Left = GetMemberName(selector);
-            filterCondition3.LocigalOperator = LogicalOperator.And;
-            filterCondition3.Right = FormatValue(end);
+            var filterCondition3 = new FilterCondition
+            {
+                Alias = alias,
+                EntityType = typeof(T),
+                Operator = "<=",
+                Left = GetMemberName(selector),
+                LocigalOperator = LogicalOperator.And,
+                Right = FormatValue(end)
+            };
             var filterCondition4 = filterCondition3;
             conditions2.Add(filterCondition4);
         }
@@ -132,13 +159,15 @@ namespace EasyDapper.MsSqlServer
             Aggregation aggregation = Aggregation.None)
         {
             var columns = Specification.Columns;
-            var columnSpecification1 = new ColumnSpecification();
-            columnSpecification1.Aggregation = aggregation;
-            columnSpecification1.Alias = alias;
-            columnSpecification1.EntityType = typeof(T);
-            columnSpecification1.Identifier = name;
-            columnSpecification1.ColumnName = GetColumnAlias<TEntity>(name);
-            columnSpecification1.AggregationColumnName = showname == "" ? name : showname;
+            var columnSpecification1 = new ColumnSpecification
+            {
+                Aggregation = aggregation,
+                Alias = alias,
+                EntityType = typeof(T),
+                Identifier = name,
+                ColumnName = GetColumnAlias<TEntity>(name),
+                AggregationColumnName = showname == "" ? name : showname
+            };
             var columnSpecification2 = columnSpecification1;
             columns.Add(columnSpecification2);
         }
@@ -161,19 +190,23 @@ namespace EasyDapper.MsSqlServer
             string alias = null,
             LogicalOperator logicalOperator = LogicalOperator.NotSet)
         {
-         
+
 
             var conditions = currentFilterGroup.Conditions;
+            var lambdaTree =
+                AtkExpressionWriterSql<T>.AtkWhereWriteToStringWithParameters(selector, AtkExpSqlType.AtkWhere, "[",
+                    "]");
             var filterCondition1 = new FilterCondition
             {
                 Alias = alias,
                 EntityType = typeof(T),
                 Left = "_LambdaTree_",
                 LocigalOperator = logicalOperator,
-                LambdaTree =
-                    AtkExpressionWriterSql<T>.AtkWhereWriteToString(selector, AtkExpSqlType.AtkWhere, "[", "]")
-
+                LambdaTree = lambdaTree?.Sql,
+                ParameterDefinitions = lambdaTree?.Parameters,
+                ExpressionOperator = lambdaTree?.Operator
             };
+
             conditions.Add(filterCondition1);
         }
 
@@ -246,25 +279,24 @@ namespace EasyDapper.MsSqlServer
         {
             var body = expression.Body as BinaryExpression;
             var joins = Specification.Joins;
-            var joinSpecification1 = new JoinSpecification();
-            joinSpecification1.LeftEntityType = typeof(TLeft);
-            joinSpecification1.LeftIdentifier = GetMemberName(body.Left).ColumnName<TRight>();
-            joinSpecification1.LeftTableAlias = leftTableAlias;
-            joinSpecification1.Operator = OperatorString(body.NodeType);
-            joinSpecification1.RightEntityType = typeof(TRight);
-            joinSpecification1.RightIdentifier =
-                GetMemberName(AtkPartialEvaluator.Eval(body.Right)).ColumnName<TRight>();
-            joinSpecification1.RightTableAlias = rightTableAlias;
-            joinSpecification1.LogicalOperator = locLogicalOperator;
+            var joinSpecification1 = new JoinSpecification
+            {
+                LeftEntityType = typeof(TLeft),
+                LeftIdentifier = GetMemberName(body.Left).ColumnName<TRight>(),
+                LeftTableAlias = leftTableAlias,
+                Operator = OperatorString(body.NodeType),
+                RightEntityType = typeof(TRight),
+                RightIdentifier = GetMemberName(AtkPartialEvaluator.Eval(body.Right)).ColumnName<TRight>(),
+                RightTableAlias = rightTableAlias,
+                LogicalOperator = locLogicalOperator
+            };
             var joinSpecification2 = joinSpecification1;
             joins.Add(joinSpecification2);
         }
 
         protected override void AddNewFilterGroup(FilterGroupType filterGroupType)
         {
-            var filterGroup1 = new FilterGroup();
-            filterGroup1.GroupType = filterGroupType;
-            filterGroup1.Parent = currentFilterGroup;
+            var filterGroup1 = new FilterGroup {GroupType = filterGroupType, Parent = currentFilterGroup};
             var filterGroup2 = filterGroup1;
             currentFilterGroup.Groups.Add(filterGroup2);
             currentFilterGroup = filterGroup2;
@@ -278,20 +310,21 @@ namespace EasyDapper.MsSqlServer
         {
             var type = typeof(T);
             var orderings1 = Specification.Orderings;
-            var orderSpecification1 = new OrderSpecification();
-            orderSpecification1.Alias = alias;
-            orderSpecification1.Direction = orderByDirection;
-            orderSpecification1.EntityType = type;
-            orderSpecification1.Identifer = GetMemberName(selector);
+            var orderSpecification1 = new OrderSpecification
+            {
+                Alias = alias, Direction = orderByDirection, EntityType = type, Identifer = GetMemberName(selector)
+            };
             orderings1.Add(orderSpecification1);
             foreach (var additionalSelector in additionalSelectors)
             {
                 var orderings2 = Specification.Orderings;
-                var orderSpecification2 = new OrderSpecification();
-                orderSpecification2.Alias = alias;
-                orderSpecification2.Direction = orderByDirection;
-                orderSpecification2.EntityType = type;
-                orderSpecification2.Identifer = GetMemberName(additionalSelector);
+                var orderSpecification2 = new OrderSpecification
+                {
+                    Alias = alias,
+                    Direction = orderByDirection,
+                    EntityType = type,
+                    Identifer = GetMemberName(additionalSelector)
+                };
                 orderings2.Add(orderSpecification2);
             }
         }
@@ -304,15 +337,16 @@ namespace EasyDapper.MsSqlServer
         {
             ThrowIfTableAlreadyJoined<T>(alias, tableName, tableSchema);
             var tables = Specification.Tables;
-            var tableSpecification1 = new SelectStatementTableSpecification();
-            tableSpecification1.Alias = alias;
-            tableSpecification1.EntityType = typeof(T);
-            tableSpecification1.JoinType = joinType;
-            tableSpecification1.TableName =
-                string.IsNullOrEmpty(tableName) ? CustomAttributeHandle.DbTableName<T>() : tableName;
-            tableSpecification1.Schema = string.IsNullOrEmpty(tableSchema)
-                ? CustomAttributeHandle.DbTableSchema<T>()
-                : tableSchema;
+            var tableSpecification1 = new SelectStatementTableSpecification
+            {
+                Alias = alias,
+                EntityType = typeof(T),
+                JoinType = joinType,
+                TableName = string.IsNullOrEmpty(tableName) ? CustomAttributeHandle.DbTableName<T>() : tableName,
+                Schema = string.IsNullOrEmpty(tableSchema)
+                    ? CustomAttributeHandle.DbTableSchema<T>()
+                    : tableSchema
+            };
             var tableSpecification2 = tableSpecification1;
             tables.Add(tableSpecification2);
         }
@@ -322,10 +356,10 @@ namespace EasyDapper.MsSqlServer
             Specification = new SelectStatementSpecification();
             var type = typeof(TEntity);
             var tables = Specification.Tables;
-            var tableSpecification = new SelectStatementTableSpecification();
-            tableSpecification.EntityType = type;
-            tableSpecification.Schema = "dbo";
-            tableSpecification.TableName = CustomAttributeHandle.DbTableName<TEntity>();
+            var tableSpecification = new SelectStatementTableSpecification
+            {
+                EntityType = type, Schema = "dbo", TableName = CustomAttributeHandle.DbTableName<TEntity>()
+            };
             tables.Add(tableSpecification);
         }
 

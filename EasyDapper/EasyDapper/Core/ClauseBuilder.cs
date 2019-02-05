@@ -36,7 +36,7 @@ namespace EasyDapper.Core
                 return "'" + ((DateTime) value).ToString("yyyy-MM-dd HH:mm:ss.fff") + "'";
             if (value is DateTimeOffset)
                 return "'" + ((DateTimeOffset) value).ToString("yyyy-MM-dd HH:mm:ss.ffffffzzz") + "'";
-            if (value is Enum)
+            if (value is System.Enum)
                 return Convert.ToInt32(value).ToString();
             if (value is byte[])
             {

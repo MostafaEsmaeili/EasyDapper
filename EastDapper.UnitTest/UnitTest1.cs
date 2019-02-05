@@ -1,4 +1,5 @@
-﻿using Castle.Windsor;
+﻿using Castle.Core.Internal;
+using Castle.Windsor;
 using EastDapper.UnitTest.IoC;
 using EastDapper.UnitTest.Model;
 using EasyDapper.Abstractions;
@@ -26,8 +27,11 @@ namespace EastDapper.UnitTest
             //});
             //u.Go();
             var s = 12;
-            var query = f.Query().Where(x => x.CodeId==s );
-            var select = query.Sql();
+            var query = f.Query().Where(x => x.CodeId<=s ).And(x=>x.State==2).Or(c=>c.Title.Contains("sss"))
+                .NestedAnd(x=>x.PreCodeId!=10).Or(x=>x.TitleEn.IsNullOrEmpty()).EndNesting();
+
+            var select = query.SqlWithParams();
+            var xa = 0;
         }
     }
 

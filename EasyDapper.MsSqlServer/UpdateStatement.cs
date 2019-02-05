@@ -32,7 +32,7 @@ namespace EasyDapper.MsSqlServer
             if (entity != null && !typeof(TEntity).GetProperties().Any(p => p.IsKeyField<TEntity>()))
                 throw new InvalidOperationException("以实例更新时，实例类必需至少有一个属性标记为[Key] 特性！");
             return
-                $"UPDATE [{(object) GetTableSchema()}].[{(object) GetTableName()}]\nSET {(object) GetSetClause("")}{(object) GetWhereClause("")};";
+                $"UPDATE [{ GetTableSchema()}].[{ GetTableName()}]\nSET { GetSetClause("")}{ GetWhereClause("")};";
         }
 
         protected override string GetSetClauseFromEntity(string perParam)

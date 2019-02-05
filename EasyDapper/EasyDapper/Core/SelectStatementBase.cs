@@ -23,7 +23,7 @@ namespace EasyDapper.Core
             IWritablePropertyMatcher writablePropertyMatcher)
             : base(statementExecutor, entityMapper, writablePropertyMatcher)
         {
-          //  InitialiseConfig();
+            //  InitialiseConfig();
         }
 
         public SelectStatementSpecificationBase Specification { get; protected set; }
@@ -37,7 +37,7 @@ namespace EasyDapper.Core
                 return EntityMapper.Map<TEntity>(reader);
             }
         }
-
+       
         public async Task<IEnumerable<TEntity>> UnionAsync(List<UnionSql> Sqls)
         {
             if (Sqls.Count() == 0)
@@ -820,10 +820,7 @@ namespace EasyDapper.Core
             string alias = null,
             bool addnest = false)
         {
-            if (whereAllreadyAdd)
-            {
-                return addnest ? NestedAnd(selector, alias) : And(selector, alias);
-            }
+            if (whereAllreadyAdd) return addnest ? NestedAnd(selector, alias) : And(selector, alias);
 
             whereAllreadyAdd = true;
             ThrowIfTableNotSpecified<T>(alias);
@@ -906,6 +903,8 @@ namespace EasyDapper.Core
 
 
         public abstract ValueTuple<IEnumerable<TEntity>, int> PageGo();
+        public abstract (string, List<PartialSelectSelectParameterDefinition>) SqlWithParams();
+
 
         public virtual ISelectStatement<TEntity> Distinct()
         {

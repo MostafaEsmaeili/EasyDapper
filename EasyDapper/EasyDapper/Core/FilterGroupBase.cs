@@ -21,6 +21,15 @@ namespace EasyDapper.Core
 
         public override string ToString()
         {
+            var counter = 0;
+            foreach (var c in Conditions)
+            {
+                foreach (var definition in c.ParameterDefinitions)
+                {
+                    definition.Params = $"@p{counter++}";
+                }
+            }
+
             return (GroupType.ToString().ToUpperInvariant() ?? "") + " " + "(" + string.Join("\n", Conditions) +
                    (Groups.Any() ? "\n" + string.Join("\n", Groups) : string.Empty) + ")";
         }

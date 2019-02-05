@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace EasyDapper.Core
 {
@@ -21,6 +22,7 @@ namespace EasyDapper.Core
         public string TableName { get; set; }
 
         public string LambdaTree { get; set; }
-        public ParameterDefinition Definition  { get; set; }
+        public List<PartialSelectSelectParameterDefinition>  ParameterDefinitions  { get; set; }
+        public string ExpressionOperator { get; set; }
     }
 }

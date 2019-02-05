@@ -2,12 +2,16 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq.Expressions;
+using EasyDapper;
 
 namespace Atk.AtkExpression
 {
     public abstract class ExpressionVisitor
     {
         protected bool IsRight = false;
+
+        public List<PartialSelectSelectParameterDefinition> ParameterDefinitions =
+            new List<PartialSelectSelectParameterDefinition>();
 
         protected virtual Expression Visit(Expression exp)
         {
@@ -74,13 +78,13 @@ namespace Atk.AtkExpression
                 case ExpressionType.TypeIs:
                     return VisitTypeIs((TypeBinaryExpression) exp);
                 default:
-                    throw new Exception(string.Format("Unhandled expression type: '{0}'", exp.NodeType));
+                    throw new Exception($"Unhandled expression type: '{exp.NodeType}'");
             }
         }
 
         protected virtual Expression VisitUnknown(Expression expression)
         {
-            throw new Exception(string.Format("Unhandled expression type: '{0}'", expression.NodeType));
+            throw new Exception($"Unhandled expression type: '{expression.NodeType}'");
         }
 
         protected virtual MemberBinding VisitBinding(MemberBinding binding)
@@ -94,24 +98,20 @@ namespace Atk.AtkExpression
                 case MemberBindingType.ListBinding:
                     return VisitMemberListBinding((MemberListBinding) binding);
                 default:
-                    throw new Exception(string.Format("Unhandled binding type '{0}'", binding.BindingType));
+                    throw new Exception($"Unhandled binding type '{binding.BindingType}'");
             }
         }
 
         protected virtual ElementInit VisitElementInitializer(ElementInit initializer)
         {
             var readOnlyCollection = VisitExpressionList(initializer.Arguments);
-            if (readOnlyCollection != initializer.Arguments)
-                return Expression.ElementInit(initializer.AddMethod, readOnlyCollection);
-            return initializer;
+            return readOnlyCollection != initializer.Arguments ? Expression.ElementInit(initializer.AddMethod, readOnlyCollection) : initializer;
         }
 
         protected virtual Expression VisitUnary(UnaryExpression u)
         {
             var operand = Visit(u.Operand);
-            if (operand != u.Operand)
-                return Expression.MakeUnary(u.NodeType, operand, u.Type, u.Method);
-            return u;
+            return operand != u.Operand ? Expression.MakeUnary(u.NodeType, operand, u.Type, u.Method) : u;
         }
 
         protected virtual Expression VisitBinary(BinaryExpression b)
@@ -136,6 +136,7 @@ namespace Atk.AtkExpression
 
         protected virtual Expression VisitConstant(ConstantExpression c)
         {
+            
             return c;
         }
 
@@ -157,9 +158,7 @@ namespace Atk.AtkExpression
         protected virtual Expression VisitMemberAccess(MemberExpression m)
         {
             var expression = Visit(m.Expression);
-            if (expression != m.Expression)
-                return Expression.MakeMemberAccess(expression, m.Member);
-            return m;
+            return expression != m.Expression ? Expression.MakeMemberAccess(expression, m.Member) : m;
         }
 
         protected virtual Expression VisitMethodCall(MethodCallExpression m)
@@ -191,33 +190,25 @@ namespace Atk.AtkExpression
                 }
             }
 
-            if (expressionList != null)
-                return expressionList.AsReadOnly();
-            return original;
+            return expressionList != null ? expressionList.AsReadOnly() : original;
         }
 
         protected virtual MemberAssignment VisitMemberAssignment(MemberAssignment assignment)
         {
             var expression = Visit(assignment.Expression);
-            if (expression != assignment.Expression)
-                return Expression.Bind(assignment.Member, expression);
-            return assignment;
+            return expression != assignment.Expression ? Expression.Bind(assignment.Member, expression) : assignment;
         }
 
         protected virtual MemberMemberBinding VisitMemberMemberBinding(MemberMemberBinding binding)
         {
             var bindings = VisitBindingList(binding.Bindings);
-            if (bindings != binding.Bindings)
-                return Expression.MemberBind(binding.Member, bindings);
-            return binding;
+            return bindings != binding.Bindings ? Expression.MemberBind(binding.Member, bindings) : binding;
         }
 
         protected virtual MemberListBinding VisitMemberListBinding(MemberListBinding binding)
         {
             var initializers = VisitElementInitializerList(binding.Initializers);
-            if (initializers != binding.Initializers)
-                return Expression.ListBind(binding.Member, initializers);
-            return binding;
+            return initializers != binding.Initializers ? Expression.ListBind(binding.Member, initializers) : binding;
         }
 
         protected virtual IEnumerable<MemberBinding> VisitBindingList(ReadOnlyCollection<MemberBinding> original)
@@ -273,9 +264,7 @@ namespace Atk.AtkExpression
         protected virtual Expression VisitLambda(LambdaExpression lambda)
         {
             var body = Visit(lambda.Body);
-            if (body != lambda.Body)
-                return Expression.Lambda(lambda.Type, body, lambda.Parameters);
-            return lambda;
+            return body != lambda.Body ? Expression.Lambda(lambda.Type, body, lambda.Parameters) : lambda;
         }
 
         protected virtual NewExpression VisitNew(NewExpression nex)
@@ -283,9 +272,7 @@ namespace Atk.AtkExpression
             IEnumerable<Expression> arguments = VisitExpressionList(nex.Arguments);
             if (arguments == nex.Arguments)
                 return nex;
-            if (nex.Members != null)
-                return Expression.New(nex.Constructor, arguments, nex.Members);
-            return Expression.New(nex.Constructor, arguments);
+            return nex.Members != null ? Expression.New(nex.Constructor, arguments, nex.Members) : Expression.New(nex.Constructor, arguments);
         }
 
         protected virtual Expression VisitMemberInit(MemberInitExpression init)
@@ -311,9 +298,7 @@ namespace Atk.AtkExpression
             IEnumerable<Expression> expressions = VisitExpressionList(na.Expressions);
             if (expressions == na.Expressions)
                 return na;
-            if (na.NodeType == ExpressionType.NewArrayInit)
-                return Expression.NewArrayInit(na.Type.GetElementType(), expressions);
-            return Expression.NewArrayBounds(na.Type.GetElementType(), expressions);
+            return na.NodeType == ExpressionType.NewArrayInit ? Expression.NewArrayInit(na.Type.GetElementType(), expressions) : Expression.NewArrayBounds(na.Type.GetElementType(), expressions);
         }
 
         protected virtual Expression VisitInvocation(InvocationExpression iv)

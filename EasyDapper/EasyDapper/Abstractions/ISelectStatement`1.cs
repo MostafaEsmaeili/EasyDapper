@@ -260,6 +260,8 @@ namespace EasyDapper.Abstractions
         int GetPageCount();
 
         ValueTuple<IEnumerable<TEntity>, int> PageGo();
+        ValueTuple<string, List<PartialSelectSelectParameterDefinition>> SqlWithParams();
+
 
         TEntity FirstOrDefault();
 

@@ -14,7 +14,7 @@ namespace EasyDapper
         {
             var typeArray = new Type[21]
             {
-                typeof(Enum),
+                typeof(System.Enum),
                 typeof(string),
                 typeof(bool),
                 typeof(byte),

@@ -14,28 +14,15 @@ namespace Atk.AtkExpression
 {
     public class AtkExpressionWriterSql<T> : ExpressionVisitor
     {
-        private static readonly char[] Splitters = new char[2]
-        {
-            '\n',
-            '\r'
-        };
+        private const string TableAlias = "_table_Alias_";
+        private const int Depth = 0;
+        private readonly TextWriter writer;
 
-        private static readonly char[] Special = new char[3]
-        {
-            '\n',
-            '\n',
-            '\\'
-        };
-
-        private string _leftbracket = "";
-        private string _rightbracket = "";
-
-        private readonly string _tableAlias = "_table_Alias_";
-        private string atkOrdeRsult = string.Empty;
+        private string _leftBracket = "";
+        private string _rightBracket = "";
+        private string atkOrderResult = string.Empty;
         private AtkExpSqlType atkRead = AtkExpSqlType.AtkWhere;
         private string atkWhereResult = string.Empty;
-        private readonly int depth = 0;
-        private readonly TextWriter writer;
 
         protected AtkExpressionWriterSql(TextWriter writer)
         {
@@ -56,37 +43,53 @@ namespace Atk.AtkExpression
         private static string Write(TextWriter writer, Expression expression, AtkExpSqlType atkSql, string leftBracket,
             string rightBracket)
         {
-
             expression = AtkPartialEvaluator.Eval(expression);
-            ParameterDefinition parameterDefinition;
+
 
             var expressionWriterSql = new AtkExpressionWriterSql<T>(writer)
             {
-                _leftbracket = leftBracket,
-                _rightbracket = rightBracket,
+                _leftBracket = leftBracket,
+                _rightBracket = rightBracket,
+                atkRead = atkSql
+            };
+            expressionWriterSql.Visit(expression);
+
+            switch (atkSql)
+            {
+                case AtkExpSqlType.AtkWhere:
+                    return Regex.Replace(expressionWriterSql.atkWhereResult, "and\\s?$", "");
+                case AtkExpSqlType.AtkOrder:
+                    return Regex.Replace(expressionWriterSql.atkOrderResult, ",\\s?$", "");
+                default:
+                    return string.Empty;
+            }
+        }
+
+        private static CustomSqlWriteExpressionResult? WriteWithParameter(TextWriter writer, Expression expression,
+            AtkExpSqlType atkSql, string leftBracket,
+            string rightBracket)
+        {
+            expression = AtkPartialEvaluator.Eval(expression);
+            PartialSelectSelectParameterDefinition leftConstantParameterDefinition = null;
+            PartialSelectSelectParameterDefinition rightConstantParameterDefinition = null;
+            var expressionOperator = string.Empty;
+
+            var expressionWriterSql = new AtkExpressionWriterSql<T>(writer)
+            {
+                _leftBracket = leftBracket,
+                _rightBracket = rightBracket,
                 atkRead = atkSql
             };
             expressionWriterSql.Visit(expression);
             if (expression is LambdaExpression lambda)
             {
                 var body = lambda.Body as BinaryExpression;
+                expressionOperator = new AtkExpressionWriterSql<T>(writer).GetOperator(lambda.Body.NodeType);
+
                 if (body != null && body.Left.NodeType == ExpressionType.Constant)
                 {
-                    var b = body.Left as ConstantExpression;
-
-                    parameterDefinition = new ParameterDefinition
-                    {
-                        DbType = ClrTypeToSqlDbTypeMapper.GetSqlDbTypeFromClrType(body.Left.Type),
-                        Direction = ParameterDirection.Input,
-                        IsNullable = body.Left.Type.IsNullable(),
-
-                    };
-                    
-                }
-                if (body != null && body.Right.NodeType == ExpressionType.Constant)
-                {
-                    if (body.Right is ConstantExpression b)
-                        parameterDefinition = new ParameterDefinition
+                    if (body.Left is ConstantExpression b)
+                        leftConstantParameterDefinition = new PartialSelectSelectParameterDefinition
                         {
                             DbType = ClrTypeToSqlDbTypeMapper.GetSqlDbTypeFromClrType(body.Left.Type),
                             Direction = ParameterDirection.Input,
@@ -94,62 +97,35 @@ namespace Atk.AtkExpression
                             Value = Convert.ChangeType(b.Value, body.Left.Type)
                         };
                 }
+
+                if (body != null && body.Right.NodeType == ExpressionType.Constant)
+                    if (body.Right is ConstantExpression b)
+                        rightConstantParameterDefinition = new PartialSelectSelectParameterDefinition
+                        {
+                            DbType = ClrTypeToSqlDbTypeMapper.GetSqlDbTypeFromClrType(body.Right.Type),
+                            Direction = ParameterDirection.Input,
+                            IsNullable = body.Right.Type.IsNullable(),
+                            Value = Convert.ChangeType(b.Value,
+                                Nullable.GetUnderlyingType(body.Right.Type) ?? body.Right.Type)
+                        };
             }
+
             switch (atkSql)
             {
                 case AtkExpSqlType.AtkWhere:
-                    return Regex.Replace(expressionWriterSql.atkWhereResult, "and\\s?$", "");
+
+                    return new CustomSqlWriteExpressionResult(
+                        Regex.Replace(expressionWriterSql.atkWhereResult, "and\\s?$", ""),
+                        expressionOperator,
+                        leftConstantParameterDefinition,
+                        rightConstantParameterDefinition
+                    );
+
                 case AtkExpSqlType.AtkOrder:
-                    return Regex.Replace(expressionWriterSql.atkOrdeRsult, ",\\s?$", "");
+                    return null; //Regex.Replace(expressionWriterSql.atkOrderResult, ",\\s?$", "");
                 default:
-                    return string.Empty;
+                    return null;
             }
-        }
-
-        private static Tuple<string, ParameterDefinition> WriteWithParameter(TextWriter writer, Expression expression, AtkExpSqlType atkSql, string leftBracket,
-            string rightBracket)
-        {
-
-            expression = AtkPartialEvaluator.Eval(expression);
-            ParameterDefinition parameterDefinition;
-            var expressionWriterSql = new AtkExpressionWriterSql<T>(writer)
-            {
-                _leftbracket = leftBracket,
-                _rightbracket = rightBracket,
-                atkRead = atkSql
-            };
-            expressionWriterSql.Visit(expression);
-            if (expression is LambdaExpression lambda)
-            {
-                var body = lambda.Body as BinaryExpression;
-                if (body != null && body.Left.NodeType == ExpressionType.Constant)
-                {
-                    var b = body.Left as ConstantExpression;
-
-                    parameterDefinition = new ParameterDefinition
-                    {
-                        DbType = ClrTypeToSqlDbTypeMapper.GetSqlDbTypeFromClrType(body.Left.Type),
-                        Direction = ParameterDirection.Input,
-                        IsNullable = body.Left.Type.IsNullable(),
-
-                    };
-                }
-                if (body != null && body.Right.NodeType == ExpressionType.Constant)
-                {
-
-                }
-            }
-
-            return null;
-            //switch (atkSql)
-            //{
-            //    case AtkExpSqlType.AtkWhere:
-            //        return Regex.Replace(expressionWriterSql.atkWhereResult, "and\\s?$", "");
-            //    case AtkExpSqlType.AtkOrder:
-            //        return Regex.Replace(expressionWriterSql.atkOrdeRsult, ",\\s?$", "");
-            //    default:
-            //        return string.Empty;
-            //}
         }
 
         private static string WriteToString(Expression expression)
@@ -166,6 +142,13 @@ namespace Atk.AtkExpression
                 .Replace("'+'", "");
         }
 
+        public static CustomSqlWriteExpressionResult? AtkWhereWriteToStringWithParameters(Expression expression,
+            AtkExpSqlType atkSql, string leftBracket = "",
+            string rightBracket = "")
+        {
+            return WriteWithParameter(new StringWriter(), expression, atkSql, leftBracket, rightBracket);
+        }
+
         protected void WriteLine(Indentation style)
         {
             writer.WriteLine();
@@ -179,8 +162,9 @@ namespace Atk.AtkExpression
                     atkWhereResult += text;
                     break;
                 case AtkExpSqlType.AtkOrder:
-                    atkOrdeRsult += text;
+                    atkOrderResult += text;
                     break;
+                
             }
 
             writer.Write(text);
@@ -190,7 +174,7 @@ namespace Atk.AtkExpression
         {
             if (style == Indentation.Inner || style != Indentation.Outer)
                 return;
-            Debug.Assert(depth >= 0);
+            Debug.Assert(Depth >= 0);
         }
 
         protected virtual string GetOperator(ExpressionType type)
@@ -543,7 +527,7 @@ namespace Atk.AtkExpression
         {
             if (m.Member.DeclaringType == typeof(string))
             {
-                Write(_tableAlias + _leftbracket + AtkTypeHelper.GetColumnAlias<T>(m.Member.Name) + _rightbracket);
+                Write(TableAlias + _leftBracket + AtkTypeHelper.GetColumnAlias<T>(m.Member.Name) + _rightBracket);
                 if (m.Member.Name == "Length")
                 {
                     Write("LEN(");
@@ -552,8 +536,8 @@ namespace Atk.AtkExpression
                     return m;
                 }
             }
-            else if (m.Member.DeclaringType.IsGenericType &&
-                     m.Member.DeclaringType.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
+            else if (m.Member.DeclaringType != null && (m.Member.DeclaringType.IsGenericType &&
+                                                        m.Member.DeclaringType.GetGenericTypeDefinition() == typeof(Nullable<>)))
             {
                 if (m.Member.Name == "HasValue")
                 {
@@ -565,7 +549,7 @@ namespace Atk.AtkExpression
             }
             else if (m.Member.DeclaringType == typeof(DateTime) || m.Member.DeclaringType == typeof(DateTimeOffset))
             {
-                Write(_tableAlias + _leftbracket + AtkTypeHelper.GetColumnAlias<T>(m.Member.Name) + _rightbracket);
+                Write(TableAlias + _leftBracket + AtkTypeHelper.GetColumnAlias<T>(m.Member.Name) + _rightBracket);
                 switch (m.Member.Name)
                 {
                     case "Day":
@@ -621,7 +605,7 @@ namespace Atk.AtkExpression
             }
             else
             {
-                Write(_tableAlias + _leftbracket + AtkTypeHelper.GetColumnAlias<T>(m.Member.Name) + _rightbracket);
+                Write(TableAlias + _leftBracket + AtkTypeHelper.GetColumnAlias<T>(m.Member.Name) + _rightBracket);
             }
 
             return base.VisitMemberAccess(m);
@@ -629,7 +613,7 @@ namespace Atk.AtkExpression
 
         protected override MemberAssignment VisitMemberAssignment(MemberAssignment assignment)
         {
-            Write(_tableAlias + _leftbracket + AtkTypeHelper.GetColumnAlias<T>(assignment.Member.Name) + _rightbracket);
+            Write(TableAlias + _leftBracket + AtkTypeHelper.GetColumnAlias<T>(assignment.Member.Name) + _rightBracket);
             Write(" = ");
             Visit(assignment.Expression);
             return assignment;
@@ -648,7 +632,7 @@ namespace Atk.AtkExpression
 
         protected override MemberListBinding VisitMemberListBinding(MemberListBinding binding)
         {
-            Write(_tableAlias + _leftbracket + AtkTypeHelper.GetColumnAlias<T>(binding.Member.Name) + _rightbracket);
+            Write(TableAlias + _leftBracket + AtkTypeHelper.GetColumnAlias<T>(binding.Member.Name) + _rightBracket);
             Write(" = {");
             WriteLine(Indentation.Inner);
             VisitElementInitializerList(binding.Initializers);
@@ -659,7 +643,7 @@ namespace Atk.AtkExpression
 
         protected override MemberMemberBinding VisitMemberMemberBinding(MemberMemberBinding binding)
         {
-            Write(_tableAlias + _leftbracket + AtkTypeHelper.GetColumnAlias<T>(binding.Member.Name) + _rightbracket);
+            Write(TableAlias + _leftBracket + AtkTypeHelper.GetColumnAlias<T>(binding.Member.Name) + _rightBracket);
             Write(" = {");
             WriteLine(Indentation.Inner);
             VisitBindingList(binding.Bindings);
@@ -672,7 +656,7 @@ namespace Atk.AtkExpression
         {
             var lower = m.Method.Name.ToLower();
             var str1 = lower;
-            if (!(str1 == "where"))
+            if (str1 != "where")
             {
                 if (str1 == "orderby" || str1 == "orderbydescending" || str1 == "thenbydescending" || str1 == "thenby")
                 {
@@ -1052,9 +1036,9 @@ namespace Atk.AtkExpression
             {
                 var str2 = lower;
                 if (str2 == "orderbydescending" || str2 == "thenbydescending")
-                    atkOrdeRsult += " Desc";
+                    atkOrderResult += " Desc";
                 if (atkRead == AtkExpSqlType.AtkOrder)
-                    atkOrdeRsult += ",";
+                    atkOrderResult += ",";
                 else
                     atkWhereResult += " and ";
                 WriteLine(Indentation.Outer);
